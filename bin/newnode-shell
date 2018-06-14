@@ -1,0 +1,50 @@
+#!/bin/bash -ue
+
+# Open a shell in a fresh container matching the Wikimedia CI environment
+# for Node.js Jenkins jobs.
+#
+# Usage:
+#
+#   self@precious.local$ cd dev/oojs/
+#   self@precious.local$ newnode-shell
+#
+#   nobody@a35a3fd21257:/oojs$ npm install
+#   nobody@a35a3fd21257:/oojs$ npm test
+#   nobody@a35a3fd21257:/oojs$ npm run doc
+#   nobody@a35a3fd21257:/oojs$ exit
+#
+# The container runs Debian Stretch, and has installed:
+#
+# - Node 10
+# - npm 6
+# - Chromium
+# - Firefox
+# - JSDuck 5 (Ruby 2.3)
+#
+# The directory from your workstation where you launched the shell from,
+# is the only directory that is visible (read-write) from your workstation.
+# It is mounted at /$basename. Everything else inside the container is
+# ephemeral, and unique to that specific shell instance.
+#
+# And yes, you can have multiple unrelated shells open! Each will have its
+# own temporary environment.
+#
+# It is efficient in terms of disk space. Docker internally uses UnionFS,
+# which for our purposes means that if you launch 10 shells, it won't cost
+# you the diskspace of 10 whole containers. Instead, the base image is shared
+# between instances with only the changes tracked locally (e.g. copy-on-write,
+# de-duplicated).
+#
+# Enjoy!
+#
+# -- Krinkle, 2019-01-17.
+#
+name=$(basename "$PWD")
+
+# Use exec, so that Terminal tab is named after the "$name;bash" param,
+# instead of generic 'newnode-shell'.
+exec docker run --rm --interactive --tty \
+	--volume /"$PWD"://"$name" -e 'HOME=/tmp' \
+	--entrypoint /bin/sh \
+	docker-registry.wikimedia.org/releng/node10-test-browser:0.2.3 \
+	-c "cd /$name/;bash"
