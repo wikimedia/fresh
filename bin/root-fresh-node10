@@ -1,0 +1,97 @@
+#!/bin/bash -u
+#
+# Create a fresh container and start a Bash session within it.
+#
+# The current working directory is mounted at /$basename,
+# and the prompt will start in that directory.
+#
+# Install:
+#
+#  1. Save this file to /usr/local/bin/fresh
+#  2. Run `chmod +x /usr/local/bin/fresh`
+#
+# If you prefer a more explicit command name, one could instead
+# save it as "fresh-node", or "fresh-node10".
+#
+# Usage:
+#
+#   self@precious.local$ cd dev/oojs/
+#   self@precious.local$ fresh
+#
+#   # Fresh environment!
+#   nobody@a35a3fd21257:/oojs$ npm install
+#   nobody@a35a3fd21257:/oojs$ npm test
+#   nobody@a35a3fd21257:/oojs$ npm run doc
+#   nobody@a35a3fd21257:/oojs$ exit
+#
+# The directory from your workstation where you launched the shell
+# from, is the only directory that is visible from your workstation.
+# Everything else within the container is ephemeral, and unique to
+# that specific shell session.
+#
+# And yes, you can have multiple shells open!
+# Each shell gets its own fresh container.
+#
+# It is efficient in terms of disk space. Docker internally uses
+# UnionFS, which for our purposes means that if you launch 10 shells,
+# it won't cost you the diskspace of 10 Debian Linux installations.
+# Instead, the base image is (safely) shared between containers with
+# only local changes being tracked locally (e.g. copy-on-write).
+#
+# Enjoy!
+#
+# -- Krinkle, 2019
+#
+
+imagename=docker-registry.wikimedia.org/releng/node10-test-browser
+imageversion=0.3.3
+shortname=fresh-node10
+basename=$(basename "$PWD")
+
+# Set title
+echo -e '\033]2;'"$shortname"'\007\c'
+# Restore title afterwards
+trap "echo -e '\033]2;\007'" 0 SIGTERM SIGINT
+
+# Color codes http://linux.101hacks.com/ps1-examples/prompt-color-using-tput/
+CLR_NONE=`tput sgr0`
+CLR_BOLD=`tput bold`
+CLR_GREEN=`tput setaf 2`
+CLR_GREY=`tput setaf 7`
+
+welcomecmd=". /etc/os-release
+echo \"$CLR_GREY# instance of $imagename:$CLR_BOLD$imageversion$CLR_NONE$CLR_GREY
+#
+# last modified: \$(date '+%Y-%m-%d')
+# os: \$PRETTY_NAME
+# software: Node.js \$(node --version) (npm \$(npm --version))
+#           Chromium \$(chromium --product-version)
+#           \$(firefox --version)
+#           Ruby .. (JSDuck ..)
+#           \$(ruby --version)
+#           \$(jsduck --version)
+# mount: /$basename ➟ $PWD
+
+🌱  ${CLR_BOLD}${CLR_GREEN}Fresh!
+$CLR_NONE\""
+
+# Launch faster by avoiding the above file reads and shell commands
+welcomecmd_static="echo \"$CLR_GREY# instance of $imagename:$CLR_BOLD$imageversion$CLR_NONE$CLR_GREY
+#
+# last modified: 2019-02-21
+# os: Debian Linux 9 (Stretch)
+# software: Node.js v10.4.0 (npm 6.5.0)
+#           Chromium 71.0.3578.80
+#           Mozilla Firefox 60.5.1
+#           Ruby 2.3.3 (JSDuck 5.3.4)
+# mount: /$basename ➟ $PWD
+
+🌱  ${CLR_BOLD}${CLR_GREEN}Fresh!
+$CLR_NONE\""
+
+docker run --rm --interactive --tty \
+	--volume /"$PWD"://"$basename" -e 'HOME=/tmp' \
+	--entrypoint /bin/sh \
+	--user root \
+	"$imagename:$imageversion" \
+	-c "cd /$basename/;$welcomecmd_static;bash"
