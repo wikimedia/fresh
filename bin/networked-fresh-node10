@@ -44,7 +44,7 @@
 #
 
 imagename=docker-registry.wikimedia.org/releng/node10-test-browser
-imageversion=0.3.3
+imageversion=0.5.0
 shortname=fresh-node10
 basename=$(basename "$PWD")
 envfile="$(mktemp)"
@@ -79,11 +79,11 @@ $CLR_NONE\""
 # Launch faster by avoiding the above file reads and shell commands
 welcomecmd_static="echo \"$CLR_GREY# instance of $imagename:$CLR_BOLD$imageversion$CLR_NONE$CLR_GREY
 #
-# last modified: 2019-02-21
+# last modified: 2019-04-09
 # os: Debian Linux 9 (Stretch)
-# software: Node.js v10.4.0 (npm 6.5.0)
+# software: Node.js v10.15.2 (npm 6.5.0)
 #           Chromium 71.0.3578.80
-#           Mozilla Firefox 60.5.1
+#           Mozilla Firefox 60.6.1
 #           Ruby 2.3.3 (JSDuck 5.3.4)
 # mount: /$basename ➟ $PWD
 
