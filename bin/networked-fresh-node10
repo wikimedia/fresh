@@ -44,7 +44,7 @@
 #
 
 imagename=docker-registry.wikimedia.org/releng/node10-test-browser
-imageversion=0.5.0
+imageversion=0.6.0
 shortname=fresh-node10
 basename=$(basename "$PWD")
 envfile="$(mktemp)"
@@ -60,31 +60,31 @@ CLR_BOLD=`tput bold`
 CLR_GREEN=`tput setaf 2`
 CLR_GREY=`tput setaf 7`
 
-welcomecmd=". /etc/os-release
-echo \"$CLR_GREY# instance of $imagename:$CLR_BOLD$imageversion$CLR_NONE$CLR_GREY
-#
-# last modified: \$(date '+%Y-%m-%d')
-# os: \$PRETTY_NAME
-# software: Node.js \$(node --version) (npm \$(npm --version))
-#           Chromium \$(chromium --product-version)
-#           \$(firefox --version)
-#           Ruby .. (JSDuck ..)
-#           \$(ruby --version)
-#           \$(jsduck --version)
-# mount: /$basename ➟ $PWD
+# welcomecmd=". /etc/os-release
+# echo \"$CLR_GREY# instance of $imagename:$CLR_BOLD$imageversion$CLR_NONE$CLR_GREY
+# #
+# # last modified: \$(date '+%Y-%m-%d')
+# # os: \$PRETTY_NAME
+# # software: Node.js \$(node --version) (npm \$(npm --version))
+# #           Chromium \$(chromium --product-version)
+# #           \$(firefox --version)
+# #           Ruby .. (JSDuck ..)
+# #           \$(ruby --version)
+# #           \$(jsduck --version)
+# # mount: /$basename ➟ $PWD
 
-🌱  ${CLR_BOLD}${CLR_GREEN}Fresh!
-$CLR_NONE\""
+# 🌱  ${CLR_BOLD}${CLR_GREEN}Fresh!
+# $CLR_NONE\""
 
 # Launch faster by avoiding the above file reads and shell commands
 welcomecmd_static="echo \"$CLR_GREY# instance of $imagename:$CLR_BOLD$imageversion$CLR_NONE$CLR_GREY
 #
-# last modified: 2019-04-09
+# last modified: 2019-08-30
 # os: Debian Linux 9 (Stretch)
 # software: Node.js v10.15.2 (npm 6.5.0)
 #           Chromium 71.0.3578.80
-#           Mozilla Firefox 60.6.1
-#           Ruby 2.3.3 (JSDuck 5.3.4)
+#           Mozilla Firefox 60.7.0
+#           Ruby 2.3.3p222 (JSDuck 5.3.4)
 # mount: /$basename ➟ $PWD
 
 🌱  ${CLR_BOLD}${CLR_GREEN}Fresh!
