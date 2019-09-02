@@ -90,7 +90,7 @@ welcomecmd_static="echo \"$CLR_GREY# instance of $imagename:$CLR_BOLD$imageversi
 🌱  ${CLR_BOLD}${CLR_GREEN}Fresh!
 $CLR_NONE\""
 
-env | grep MW_ > "$envfile"
+env | grep -E 'MW_|MEDIAWIKI_' > "$envfile"
 
 # https://docs.docker.com/network/network-tutorial-host/
 docker run --rm --interactive --tty \
