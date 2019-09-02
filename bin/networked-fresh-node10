@@ -79,7 +79,7 @@ CLR_GREY=`tput setaf 7`
 # Launch faster by avoiding the above file reads and shell commands
 welcomecmd_static="echo \"$CLR_GREY# instance of $imagename:$CLR_BOLD$imageversion$CLR_NONE$CLR_GREY
 #
-# last modified: 2019-08-30
+# last modified: 2019-09-02
 # os: Debian Linux 9 (Stretch)
 # software: Node.js v10.15.2 (npm 6.5.0)
 #           Chromium 71.0.3578.80
