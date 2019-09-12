@@ -101,4 +101,6 @@ Any changes made elsewhere in the container, are lost once you exit Fresh.
 When you open an application or execute a program from the terminal,
 that program can do **anything** that you can do. This should scare you.
 
+See also _[The worst that could happen](https://medium.com/@timotijhof/how-to-protect-yourself-from-vulnerable-npm-packages-c03f85249651)_.
+
 To create your own Docker base image, see [Tutorial.md](./Tutorial.md).
