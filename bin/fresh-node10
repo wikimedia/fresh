@@ -93,3 +93,19 @@ docker run --rm --interactive --tty -e 'HOME=/tmp' \
 # The $docker_args variable is expanded in this way to avoid passing "",
 # which would be misinterpreted as docker-run argument.
 # See <https://stackoverflow.com/a/7577209/319266>
+
+# Avoid file reads and shell commands as part of the welcome message.
+# Instead, update $welcomecmd before a release by running the below
+# instead of the above
+#
+# welcomecmd=". /etc/os-release
+# echo \"$CLR_GREY# image: $imagename:$imageversion
+# # software: \$PRETTY_NAME
+# #           Node.js \$(node --version) (npm \$(npm --version))
+# #           Chromium \$(chromium --product-version)
+# #           \$(firefox --version)
+# #           \$(jsduck --version) \$(ruby --version)
+# $CLR_NONE\""
+# docker run --rm --interactive --tty --entrypoint /bin/sh \
+#  "$imagename:$imageversion" \
+#  -c "$welcomecmd;bash"
