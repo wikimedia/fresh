@@ -10,17 +10,15 @@ _without_ putting your personal data at risk!
 Run the following from a terminal:
 
 ```sh
-curl -s https://raw.githubusercontent.com/wikimedia/fresh/19.09.0/bin/fresh-node10 \
+curl -s https://raw.githubusercontent.com/wikimedia/fresh/19.09.1/bin/fresh-node10 \
 > /usr/local/bin/fresh-node \
-&& curl -s https://raw.githubusercontent.com/wikimedia/fresh/19.09.0/bin/networked-fresh-node10 \
-> /usr/local/bin/networked-fresh-node \
-&& chmod +x /usr/local/bin/fresh-node /usr/local/bin/networked-fresh-node \
-&& echo -e '\n\xf0\x9f\x8c\xb1\x20Fresh\x2019.09.0\x20is\x20now\x20ready\x21\n'
+&& chmod +x /usr/local/bin/fresh-node \
+&& echo -e '\n\xf0\x9f\x8c\xb1\x20Fresh\x2019.09.1\x20is\x20now\x20ready\x21\n'
 ```
 
-This will save [fresh-node](/bin/fresh-node10) and [networked-fresh-node](/bin/networked-fresh-node10) to `/usr/local/bin/`, and marks these files as executable.
+This will save [fresh-node](/bin/fresh-node10) to `/usr/local/bin/`, and marks the file as executable.
 
-Programs in this directory automatically become commands you can use from your terminal.
+Programs in this directory automatically become commands you can run from your terminal.
 
 ### What's inside
 
@@ -29,7 +27,7 @@ Programs in this directory automatically become commands you can use from your t
 * **Chromium**
 * `chromedriver`, `ffmpeg`, and `xvfb` (for browser tests)
 * JSDuck
-* Debian 9 Jessie (kernel)
+* Debian Linux 9 Stretch
 
 ### Prerequisites
 
@@ -39,28 +37,28 @@ You'll need to have Docker installed. See [Docker CE for Linux](https://docs.doc
 
 With Fresh installed, navigate your terminal to a project directory in which
 you might need to run commands like `npm install` or `npm test`.
-Before you run such commands, run `fresh-node` to enter a Fresh environment.
+Before you run such commands, use `fresh-node` to enter a Fresh environment.
 
 ```
-you@precious.local:~$ cd dev/oojs
-you@precious.local:oojs$ fresh-node
+you@precious.local:~$ cd myproject/
+you@precious.local:myproject$ fresh-node
 
-# fresh: 19.09.0
-# image: docker-registry.wikimedia.org/…/node10-test-browser…
-# os: Debian Linux 9 (Stretch)
-# software: Node.js 10.… (npm 6.…)
+# fresh: 19.09.1
+# image: docker-registry.wikimedia.org/…/node10-test-browser:…
+# software: Debian Linux 9 Stretch
+#           Node.js 10 (npm 6)
 #           Chromium …
 #           Mozilla Firefox …
-#           JSDuck 5.… (Ruby 2.3.3)
-# mount: /oojs ➟ /Users/you/Dev/oojs
+#           JSDuck 5 (Ruby 2.3)
+# mount: /myproject ➟ /Users/you/myproject (read-write)
 
 🌱  Fresh!
 
-nobody@76010858c836:/oojs$
+nobody@76010858c836:/myproject$
 ```
 
-You can now execute commands such as `npm install`, `npm test` and other `npm run`
-commands.
+You can now execute commands such as `npm install`, `npm test`, and
+other `npm run` commands.
 
 ## How does it work
 
@@ -68,10 +66,10 @@ The first time you start a Fresh environment, Docker will download the
 container image layers from `docker-registry.wikimedia.org`. This may take
 a few minutes.
 
-The fresh-node command uses the [`node10-test-browser` image](./Tutorial.md),
-which is the same exact image used by Jenkins in Wikimedia Foundation CI.
+The fresh-node command uses the [`node10-test-browser` image](./Tutorial.md#start-of-content),
+which is the same exact image used by Jenkins CI at Wikimedia Foundation.
 This means you can trust that if it works in Fresh, it'll work in CI.
-And vice-versa, you can use Fresh to reproduce test failures locally.
+And vice-versa, you can use Fresh to locally reproduce test failures.
 
 ### Fast
 

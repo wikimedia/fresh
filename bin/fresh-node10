@@ -1,10 +1,10 @@
 #!/bin/bash -eu
 #
-# Fresh 19.09.0 (<https://github.com/wikimedia/fresh>)
+# Fresh 19.09.1 (<https://github.com/wikimedia/fresh>)
 #
 # This is free and unencumbered software released into the public domain.
 
-scriptversion='19.09.0 (2019-09-02)'
+scriptversion='19.09.1 (2019-09-12)'
 imagename=docker-registry.wikimedia.org/releng/node10-test-browser
 imageversion=0.6.0
 shortname=fresh-node10
