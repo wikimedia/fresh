@@ -1,48 +1,95 @@
-#!/bin/bash -u
+#!/bin/bash -eu
 #
 # Fresh 19.09.0 (<https://github.com/wikimedia/fresh>)
 #
-# Usage:
-#
-#   you@precious.local:~/dev/oojs$ fresh
-#
-#   # Fresh environment!
-#   nobody@76010858c836:/oojs$ …
-#   nobody@76010858c836:/oojs$ exit
-#
 # This is free and unencumbered software released into the public domain.
-#
 
 scriptversion='19.09.0 (2019-09-02)'
 imagename=docker-registry.wikimedia.org/releng/node10-test-browser
 imageversion=0.6.0
 shortname=fresh-node10
-mountpath="$PWD"
-mountname=$(basename "$PWD")
+mountsrc="$PWD"
+mountdest="/"$(basename "$PWD")
+welcometxt_suffix=
+docker_args=()
 
-# Change title of the Terminal window, and restore it afterwards
-echo -e '\033]2;'"$shortname"'\007\c'
-trap "echo -e '\033]2;\007'" 0 SIGTERM SIGINT
+# Parse options
+allow_env_mw=
+allow_net=
+allow_root=
+for arg in "$@"; do
+	case "$arg" in
+		# Option: -env
+		#   Forward "MW_*" and "MEDIAWIKI_*" environment variables from the host machine
+		#   to the Fresh container. This is designed for use with MediaWiki browser tests.
+		-env|-e|-env-mw) allow_env_mw=1 ;;
+		# Option: -net
+		#   This exposes network ports from the host machine to the Fresh container.
+		#   For example, to enable access to a MediaWiki web server.
+		#   https://docs.docker.com/network/network-tutorial-host/
+		-net) allow_net=1 ;;
+		# Option: -root
+		#   Log into to the Fresh container user 'root' instead of 'nobody'.
+		#   This means you can use sudo commands inside the container, such as apt-get.
+		-root) allow_root=1 ;;
+		*)
+		echo "unknown option: $arg" 1>&2
+		echo "usage: fresh-node [-env] [-git] [-net] [-root]" 1>&2
+		exit 1
+		;;
+	esac
+done
 
 # Color codes. – http://linux.101hacks.com/ps1-examples/prompt-color-using-tput/
 CLR_NONE=`tput sgr0`
 CLR_BOLD=`tput bold`
 CLR_GREEN=`tput setaf 2`
+CLR_YELLOW=`tput setaf 3`
 CLR_GREY=`tput setaf 7`
-welcomecmd_static="echo \"$CLR_GREY# fresh: $CLR_BOLD$scriptversion$CLR_NONE$CLR_GREY
+
+if [ -n "$allow_env_mw" ]; then
+	envfile="$(mktemp)"
+	env | grep -E 'MW_|MEDIAWIKI_' > "$envfile"
+	welcometxt_suffix+="# ${CLR_YELLOW}env: MW_*, MEDIAWIKI_*${CLR_NONE}\n"
+	docker_args+=("--env-file" "$envfile")
+	# Teardown: unlink tmp env file, restore window title
+	trap "rm -f \"$envfile\"; echo -e '\033]2;\007'" 0 SIGTERM SIGINT
+else
+	# Teardown: restore window title
+	trap "echo -e '\033]2;\007'" 0 SIGTERM SIGINT
+fi
+if [ -n "$allow_net" ]; then
+	welcometxt_suffix+="# ${CLR_YELLOW}net: expose host${CLR_NONE}\n"
+	docker_args+=("--network" "host")
+fi
+if [ -n "$allow_root" ]; then
+	docker_args+=("--user" "root")
+fi
+
+# Setup: Change window title
+echo -e '\033]2;'"$shortname"'\007\c'
+
+welcomecmd="echo \"$CLR_GREY# fresh: $CLR_BOLD$scriptversion$CLR_NONE$CLR_GREY
 # image: $imagename:$imageversion
-# os: Debian Linux 9 (Stretch)
-# software: Node.js v10.15.2 (npm 6.5.0)
+# software: Debian Linux 9 Stretch
+#           Node.js v10.15.2 (npm 6.5.0)
 #           Chromium 71.0.3578.80
 #           Mozilla Firefox 60.7.0
-#           JSDuck 5.3.4 (Ruby 2.3.3p222)
-# mount: /$mountname ➟ $mountpath
-
+#           JSDuck 5.3.4 (Ruby 2.3.3)
+# mount: $mountdest      ➟ $mountsrc      (read-write)
+#        $mountdest/.git ➟ $mountsrc/.git (read-only)
+$welcometxt_suffix
 🌱  ${CLR_BOLD}${CLR_GREEN}Fresh!
 $CLR_NONE\""
 
-docker run --rm --interactive --tty \
-	--volume /"$mountpath"://"$mountname" -e 'HOME=/tmp' \
+docker run --rm --interactive --tty -e 'HOME=/tmp' \
+	--mount type=bind,source="$mountsrc",target="$mountdest",consistency=delegated \
+	--mount type=bind,source="$mountsrc"/.git,target="$mountdest"/.git,readonly,consistency=cached \
+	${docker_args[@]+"${docker_args[@]}"} \
 	--entrypoint /bin/sh \
 	"$imagename:$imageversion" \
-	-c "cd /$mountname/;$welcomecmd_static;bash"
+	-c "cd $mountdest/;$welcomecmd;bash"
+
+# The $docker_args variable is expanded in this way to avoid passing "",
+# which would be misinterpreted as docker-run argument.
+# See <https://stackoverflow.com/a/7577209/319266>

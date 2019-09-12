@@ -1,4 +1,4 @@
-#!/bin/bash -u
+#!/bin/bash -eu
 #
 # Fresh 19.09.0-networked (<https://github.com/wikimedia/fresh>)
 #
