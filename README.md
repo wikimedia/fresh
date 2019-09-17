@@ -20,6 +20,21 @@ This will save [fresh-node](/bin/fresh-node10) to `/usr/local/bin/`, and marks t
 
 Programs in this directory automatically become commands you can run from your terminal.
 
+### Integrity
+
+Verify the integrity of your installation by computing the SHA-512 checksum of the installed script and comparing it to the table below.
+
+| Checksum for Fresh 19.09.1
+|--
+| `8d53fda6330314…5587a63ed4744f`
+
+Alternatively, run the below script and confirm that it outputs `fresh-node: OK`.
+
+```sh
+integrity=8d53fda633031496507aab6edda792d3fe40e8a54d07bc37d040c0486c65f1f7d372b40d89e6532da5a36725cf6f5e78dd51cc2872423de5a5587a63ed4744ff;
+echo "$integrity  /usr/local/bin/fresh-node" | shasum -c || (echo -e "\xe2\x9d\x8c"; exit 1)
+```
+
 ### What's inside
 
 * **Node.js** 10 with npm 6
