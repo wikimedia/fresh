@@ -22,7 +22,7 @@ Programs in this directory automatically become commands you can run from your t
 
 ### Integrity
 
-Verify the integrity of your installation by computing the SHA-512 checksum of the installed script and comparing it to the table below.
+Verify the integrity of your installation by computing the SHA-512 checksum of the installed script. For example, by running `shasum -a 512 /usr/local/bin/fresh-node`. Then, comparing it to the table below. 
 
 | Checksum for Fresh 19.09.1
 |--
