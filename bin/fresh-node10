@@ -49,7 +49,7 @@ CLR_GREY=`tput setaf 7`
 
 if [ -n "$allow_env_mw" ]; then
 	envfile="$(mktemp)"
-	env | grep -E 'MW_|MEDIAWIKI_' > "$envfile"
+	env | \grep -E 'MW_|MEDIAWIKI_' > "$envfile"
 	welcometxt_suffix+="# ${CLR_YELLOW}env: MW_*, MEDIAWIKI_*${CLR_NONE}\n"
 	docker_args+=("--env-file" "$envfile")
 	# Teardown: unlink tmp env file, restore window title
