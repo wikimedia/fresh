@@ -75,6 +75,10 @@ nobody@76010858c836:/myproject$
 You can now execute commands such as `npm install`, `npm test`, and
 other `npm run` commands.
 
+### Fish shell
+
+If using Fish shell, you can use [bass](https://github.com/edc/bass) to execute `fresh-node` with `bass fresh-node`.
+
 ## How does it work
 
 The first time you start a Fresh environment, Docker will download the
