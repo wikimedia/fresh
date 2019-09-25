@@ -17,6 +17,7 @@ docker_args=()
 allow_env_mw=
 allow_net=
 allow_root=
+bind_git_ro=
 for arg in "$@"; do
 	case "$arg" in
 		# Option: -env
@@ -47,6 +48,10 @@ CLR_GREEN=`tput setaf 2`
 CLR_YELLOW=`tput setaf 3`
 CLR_GREY=`tput setaf 7`
 
+if [ -e "$mountsrc/.git" ]; then
+	bind_git_ro=1
+	welcometxt_suffix+="#        $mountdest/.git ➟ $mountsrc/.git (read-only)\n"
+fi
 if [ -n "$allow_env_mw" ]; then
 	envfile="$(mktemp)"
 	# Backslash for grep bypasses user-defined aliases. – https://github.com/wikimedia/fresh/pull/7
@@ -78,14 +83,13 @@ welcomecmd="echo \"$CLR_GREY# fresh: $CLR_BOLD$scriptversion$CLR_NONE$CLR_GREY
 #           Mozilla Firefox 60.7.0
 #           JSDuck 5.3.4 (Ruby 2.3.3)
 # mount: $mountdest      ➟ $mountsrc      (read-write)
-#        $mountdest/.git ➟ $mountsrc/.git (read-only)
 $welcometxt_suffix
 🌱  ${CLR_BOLD}${CLR_GREEN}Fresh!
 $CLR_NONE\""
 
 docker run --rm --interactive --tty -e 'HOME=/tmp' \
 	--mount type=bind,source="$mountsrc",target="$mountdest",consistency=delegated \
-	--mount type=bind,source="$mountsrc"/.git,target="$mountdest"/.git,readonly,consistency=cached \
+	$( if [ -n "$bind_git_ro" ]; then printf %s "--mount type=bind,source="$mountsrc"/.git,target="$mountdest"/.git,readonly,consistency=cached"; fi ) \
 	${docker_args[@]+"${docker_args[@]}"} \
 	--entrypoint /bin/sh \
 	"$imagename:$imageversion" \
