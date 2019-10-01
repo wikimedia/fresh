@@ -10,10 +10,10 @@ _without_ putting your personal data at risk!
 Run the following from a terminal:
 
 ```sh
-curl -s https://raw.githubusercontent.com/wikimedia/fresh/19.09.1/bin/fresh-node10 \
+curl -s https://raw.githubusercontent.com/wikimedia/fresh/19.10.1/bin/fresh-node10 \
 > /usr/local/bin/fresh-node \
 && chmod +x /usr/local/bin/fresh-node \
-&& echo -e '\n\xf0\x9f\x8c\xb1\x20Fresh\x2019.09.1\x20is\x20now\x20ready\x21\n'
+&& echo -e '\n\xf0\x9f\x8c\xb1\x20Fresh\x2019.10.1\x20is\x20now\x20ready\x21\n'
 ```
 
 This will save [fresh-node](/bin/fresh-node10) to `/usr/local/bin/`, and marks the file as executable.
@@ -22,16 +22,16 @@ Programs in this directory automatically become commands you can run from your t
 
 ### Integrity
 
-Verify the integrity of your installation by computing the SHA-512 checksum of the installed script. For example, by running `shasum -a 512 /usr/local/bin/fresh-node`. Then, comparing it to the table below. 
+Verify the integrity of your installation by computing the SHA-512 checksum of the installed script. For example, by running `shasum -a 512 /usr/local/bin/fresh-node`. Then, comparing it to the table below.
 
-| Checksum for Fresh 19.09.1
+| Checksum for Fresh 19.10.1
 |--
-| `8d53fda6330314…5587a63ed4744f`
+| `a29aacbda91a08…30388d4a42b76e`
 
 Alternatively, run the below script and confirm that it outputs `fresh-node: OK`.
 
 ```sh
-integrity=8d53fda633031496507aab6edda792d3fe40e8a54d07bc37d040c0486c65f1f7d372b40d89e6532da5a36725cf6f5e78dd51cc2872423de5a5587a63ed4744ff;
+integrity=a29aacbda91a0828ff67ca017ba21d10343cc24d7eac246cbedda6fc25d5717fb9f05a9cf7b08d3698a9c14a9b495ef4accea1d806512ad9d830388d4a42b76e;
 echo "$integrity  /usr/local/bin/fresh-node" | shasum -c || (echo -e "\xe2\x9d\x8c"; exit 1)
 ```
 
@@ -58,13 +58,13 @@ Before you run such commands, use `fresh-node` to enter a Fresh environment.
 you@precious.local:~$ cd myproject/
 you@precious.local:myproject$ fresh-node
 
-# fresh: 19.09.1
+# fresh: …
 # image: docker-registry.wikimedia.org/…/node10-test-browser:…
 # software: Debian Linux 9 Stretch
 #           Node.js 10 (npm 6)
 #           Chromium …
 #           Mozilla Firefox …
-#           JSDuck 5 (Ruby 2.3)
+#           JSDuck (Ruby 2.3)
 # mount: /myproject ➟ /Users/you/myproject (read-write)
 
 🌱  Fresh!
