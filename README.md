@@ -89,7 +89,7 @@ And vice-versa, you can use Fresh to locally reproduce test failures.
 ### Fast
 
 Fresh is fast. Creating and launching a new container takes only a fraction
-of as second. This is made possible by Docker and its `docker run` command.
+of a second. This is made possible by Docker and its `docker run` command.
 It doesn't need to copy or clone anything. Instead, it references the
 downloaded Docker image as bottom layer (read-only) in an empty container,
 with a new (initially empty) read-write layer on top. This uses the
