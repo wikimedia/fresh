@@ -101,7 +101,7 @@ You can start as many independent Fresh environments as you want,
 without taking up a lot of disk space, and without different sessions
 affecting each other.
 
-Only the directory from which you launch Fresh, is made visbile to the container.
+Only the directory from which you launch Fresh, is made visible to the container.
 The rest of your personal hard drive is not mounted, and most networking
 capabilities are also disabled (except toward the Internet). Specifically,
 local servers and networked devices on your home network are not easily
