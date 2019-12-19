@@ -6,7 +6,7 @@
 
 scriptversion='19.10.1 (2019-10-01)'
 imagename=docker-registry.wikimedia.org/releng/node10-test-browser
-imageversion=0.6.0-s1
+imageversion=0.6.1
 shortname=fresh-node10
 mountsrc="$PWD"
 mountdest="/"$(basename "$PWD")
@@ -77,10 +77,10 @@ echo -e '\033]2;'"$shortname"'\007\c'
 
 welcomecmd="echo \"$CLR_GREY# fresh: $CLR_BOLD$scriptversion$CLR_NONE$CLR_GREY
 # image: $imagename:$imageversion
-# software: Debian Linux 9 Stretch
+# software: Debian GNU/Linux 9 (stretch)
 #           Node.js v10.15.2 (npm 6.5.0)
 #           Chromium 71.0.3578.80
-#           Mozilla Firefox 60.8.0
+#           Mozilla Firefox 68.3.0esr
 #           JSDuck 5.3.4 (Ruby 2.3.3)
 # mount: $mountdest      ➟ $mountsrc      (read-write)
 $welcometxt_suffix
