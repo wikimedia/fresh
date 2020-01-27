@@ -35,7 +35,7 @@ for arg in "$@"; do
 		-root) allow_root=1 ;;
 		*)
 		echo "unknown option: $arg" 1>&2
-		echo "usage: fresh-node [-env] [-git] [-net] [-root]" 1>&2
+		echo "usage: fresh-node [-env] [-net] [-root]" 1>&2
 		exit 1
 		;;
 	esac
