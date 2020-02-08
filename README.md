@@ -10,10 +10,10 @@ _without_ putting your personal data at risk!
 Run the following from a terminal:
 
 ```sh
-curl -s https://raw.githubusercontent.com/wikimedia/fresh/19.10.1/bin/fresh-node10 \
+curl -s https://raw.githubusercontent.com/wikimedia/fresh/20.02.1/bin/fresh-node10 \
 > /usr/local/bin/fresh-node \
 && chmod +x /usr/local/bin/fresh-node \
-&& echo -e '\n\xf0\x9f\x8c\xb1\x20Fresh\x2019.10.1\x20is\x20now\x20ready\x21\n'
+&& echo -e '\n\xf0\x9f\x8c\xb1\x20Fresh\x20is\x20now\x20ready\x21\n'
 ```
 
 This will save [fresh-node](/bin/fresh-node10) to `/usr/local/bin/`, and marks the file as executable.
@@ -24,14 +24,14 @@ Programs in this directory automatically become commands you can run from your t
 
 Verify the integrity of your installation by computing the SHA-512 checksum of the installed script. For example, by running `shasum -a 512 /usr/local/bin/fresh-node`. Then, comparing it to the table below.
 
-| Checksum for Fresh 19.10.1
+| Checksum for Fresh 20.02.1
 |--
-| `a29aacbda91a08…30388d4a42b76e`
+| `8e65c86 … 42d3bbd`
 
 Alternatively, run the below script and confirm that it outputs `fresh-node: OK`.
 
 ```sh
-integrity=a29aacbda91a0828ff67ca017ba21d10343cc24d7eac246cbedda6fc25d5717fb9f05a9cf7b08d3698a9c14a9b495ef4accea1d806512ad9d830388d4a42b76e;
+integrity=8e65c8684c552cc8e723ab5c25e93b0d395b5e5d5fd642dc804f3b393b881d0db57b82101a40076b0b51d4bddc4f165ef389dfbd7039a251ee46e0c6842d3bbd;
 echo "$integrity  /usr/local/bin/fresh-node" | shasum -c || (echo -e "\xe2\x9d\x8c"; exit 1)
 ```
 

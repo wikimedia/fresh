@@ -1,3 +1,15 @@
+20.02.1 / 2020-02-08
+==================
+
+### Changed
+
+* Bump Docker image to `node10-test-browser:0.6.1`. (James Forrester)
+  * Updated Mozilla Firefox from 60.8.0 to 68.3.0esr.
+
+### Fixed
+
+* Remove non-existent "-git" option from help text. (Kosta Harlan)
+
 19.10.1 / 2019-10-01
 ==================
 
