@@ -32,7 +32,7 @@ At a high level, the `docker run` command does three things:
 * Run a shell command in the container.
 
 The first positional argument, `"$imagename:$imageversion"`, is the base
-image, download at first run from Wikimedia. This has Node.js, Firefox,
+image we download at first run from wikimedia.org. This has Node.js, Firefox,
 etc. installed.
 
 The various options before it decide how the container is configured:
@@ -55,7 +55,7 @@ The various options before it decide how the container is configured:
   for more information.
 
 * `--entrypoint`: This decides which shell command to run inside the
-  container. On our case `/bin/sh`. The parameters to this command are
+  container. In our case `/bin/sh`. The parameters to this command are
   specified after the base image name. The full command to be executed is:
   `/bin/sh -c "cd $mountdest/;$welcomecmd;bash"`. This opens the current
   directory in the container, prints the welcome message, and starts Bash.
