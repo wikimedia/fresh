@@ -1,0 +1,170 @@
+#!/bin/bash -eu
+
+BASE=$(dirname "$(readlink -f "$0")")
+ISMAC=$(test "$(uname -s)" = "Darwin" && echo "1" || echo "")
+
+cd $BASE
+
+trim() {
+	read input
+	echo -n "${input%%[[:space:]]}"
+}
+
+pushd() {
+	# quiet
+	command pushd "$1" > /dev/null
+}
+
+popd() {
+	# quiet
+	command popd > /dev/null
+}
+
+title() {
+	echo
+	echo "test: $1..."
+}
+
+if_mac() {
+	test -n "$ISMAC" && $1 || echo "      [skip: mac-only]"
+}
+
+assert() {
+	actual="$1"
+	expected="$2"
+	printf "      \"${actual}\" == \"${expected}\"\n"
+	test "$actual" = "$expected"
+}
+
+assert_lastline() {
+	assert "$(echo "$1" | tail -n2 | trim)" "$2"
+}
+
+cleanup() {
+	rm -rf ./fixtures
+}
+cleanup
+trap cleanup 0 ERR
+
+title "basic invocation"
+{
+	FRESH_INTERNAL_RUNCMD='exit' ./bin/fresh-node10 > /dev/null
+}
+
+title "forward exit code"
+{
+	code=0
+	FRESH_INTERNAL_RUNCMD='exit 42' ./bin/fresh-node10 > /dev/null || code="$?"
+	assert "$code" "42"
+}
+
+title "environment / default CHROMIUM_FLAGS"
+{
+	result=$(FRESH_INTERNAL_RUNCMD='echo $CHROMIUM_FLAGS' ./bin/fresh-node10)
+	assert_lastline "$result" "--no-sandbox"
+}
+
+title "environment / protect FOO by default"
+{
+	export FOO="inherited"
+	result=$(FRESH_INTERNAL_RUNCMD='echo $FOO' ./bin/fresh-node10)
+	assert_lastline "$result" ""
+}
+
+title "environment / protect MW_FOO by default"
+{
+	export MW_FOO="inherited"
+	result=$(FRESH_INTERNAL_RUNCMD='echo $MW_FOO' ./bin/fresh-node10)
+	assert_lastline "$result" ""
+}
+
+title "environment / inherit MW_FOO with -env"
+{
+	export MW_FOO="inherited"
+	result=$(FRESH_INTERNAL_RUNCMD='echo $MW_FOO' ./bin/fresh-node10 -env)
+	assert_lastline "$result" "inherited"
+}
+
+title "environment / inherit MEDIAWIKI_FOO with -env"
+{
+	export MEDIAWIKI_FOO="inherited"
+	result=$(FRESH_INTERNAL_RUNCMD='echo $MEDIAWIKI_FOO' ./bin/fresh-node10 -env)
+	assert_lastline "$result" "inherited"
+}
+
+title "environment / protect FOO even with -env"
+{
+	export FOO="inherited"
+	result=$(FRESH_INTERNAL_RUNCMD='echo $FOO' ./bin/fresh-node10 -env)
+	assert_lastline "$result" ""
+}
+
+title "user / default"
+{
+	result=$(FRESH_INTERNAL_RUNCMD='/usr/bin/id -un' ./bin/fresh-node10)
+	assert_lastline "$result" "nobody"
+}
+
+title "user / with -root"
+{
+	result=$(FRESH_INTERNAL_RUNCMD='/usr/bin/id -un' ./bin/fresh-node10 -root)
+	assert_lastline "$result" "root"
+}
+
+title "mount / expose current directory as readable"
+{
+	mkdir -p fixtures/some/dir/10-read
+	pushd fixtures/some/dir/10-read
+	echo "exposed content" > file.txt
+
+	result=$(FRESH_INTERNAL_RUNCMD='cat /10-read/file.txt' $BASE/bin/fresh-node10) || true
+	assert_lastline "$result" "exposed content"
+
+	popd
+}
+
+title "mount / expose current directory as writable"
+λ() {
+	mkdir -p fixtures/some/dir/20-write
+	pushd fixtures/some/dir/20-write
+	echo "original content" > file.txt
+
+	FRESH_INTERNAL_RUNCMD='echo changed content > /20-write/file.txt' $BASE/bin/fresh-node10 > /dev/null || true
+	result=$(cat file.txt)
+	assert_lastline "$result" "changed content"
+
+	popd
+}
+# known issue, https://github.com/wikimedia/fresh/issues/11
+if_mac λ
+
+
+title "mount / cannot write to .git subdirectory file"
+{
+	mkdir -p fixtures/some/dir/30-git/.git
+	pushd fixtures/some/dir/30-git
+	echo "original content" > .git/file.txt
+	code=0
+
+	FRESH_INTERNAL_RUNCMD='echo changed content > /30-git/.git/file.txt' $BASE/bin/fresh-node10 > /dev/null || code="$?"
+	result=$(cat .git/file.txt)
+	assert_lastline "$result" "original content"
+	assert "$code" "2"
+
+	popd
+}
+
+
+title "mount / cannot create a .git subdirectory file"
+{
+	mkdir -p fixtures/some/dir/40-git/.git
+	pushd fixtures/some/dir/40-git
+	code=0
+
+	FRESH_INTERNAL_RUNCMD='touch /40-git/.git/file.txt' $BASE/bin/fresh-node10 > /dev/null || code="$?"
+	result=$(test -f .git/file.txt && echo created file || echo not created)
+	assert "$result" "not created"
+	assert "$code" "1"
+
+	popd
+}
