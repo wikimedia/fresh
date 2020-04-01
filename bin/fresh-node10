@@ -86,6 +86,7 @@ welcomecmd="echo \"$CLR_GREY# fresh: $CLR_BOLD$scriptversion$CLR_NONE$CLR_GREY
 $welcometxt_suffix
 🌱  ${CLR_BOLD}${CLR_GREEN}Fresh!
 $CLR_NONE\""
+runcmd=${FRESH_INTERNAL_RUNCMD:-bash}
 
 docker run --rm --interactive --tty -e 'HOME=/tmp' \
 	--mount type=bind,source="$mountsrc",target="$mountdest",consistency=delegated \
@@ -93,7 +94,7 @@ docker run --rm --interactive --tty -e 'HOME=/tmp' \
 	${docker_args[@]+"${docker_args[@]}"} \
 	--entrypoint /bin/sh \
 	"$imagename:$imageversion" \
-	-c "cd $mountdest/;$welcomecmd;bash"
+	-c "cd $mountdest/;$welcomecmd;$runcmd"
 
 # The $docker_args variable is expanded in this way to avoid passing "",
 # which would be misinterpreted as docker-run argument.
