@@ -2,6 +2,7 @@
 
 BASE=$(dirname "$(readlink -f "$0")")
 ISMAC=$(test "$(uname -s)" = "Darwin" && echo "1" || echo "")
+ISLINUX=$(test "$(uname -s)" = "Linux" && echo "1" || echo "")
 
 cd $BASE
 
@@ -25,8 +26,13 @@ title() {
 	echo "test: $1..."
 }
 
+
 if_mac() {
 	test -n "$ISMAC" && $1 || echo "      [skip: mac-only]"
+}
+
+if_linux() {
+	test -n "$ISLINUX" && $1 || echo "      [skip: linux-only]"
 }
 
 assert() {
@@ -117,11 +123,21 @@ title "environment / protect FOO even with -env"
 	assert_lastline "$result" ""
 }
 
-title "user / default"
-{
+title "user / default (Linux)"
+λ() {
+	host_uid=$(id -u)
+	result=$(FRESH_INTERNAL_RUNCMD='/usr/bin/id -u' ./bin/fresh-node10)
+	assert_lastline "$result" "$host_uid"
+}
+if_linux λ
+# user ID will not be passed on macOS.
+
+title "user / default (macOS)"
+λ() {
 	result=$(FRESH_INTERNAL_RUNCMD='/usr/bin/id -un' ./bin/fresh-node10)
 	assert_lastline "$result" "nobody"
 }
+if_mac λ
 
 title "user / with -root"
 {
@@ -142,7 +158,7 @@ title "mount / expose current directory as readable"
 }
 
 title "mount / expose current directory as writable"
-λ() {
+{
 	mkdir -p fixtures/some/dir/20-write
 	pushd fixtures/some/dir/20-write
 	echo "original content" > file.txt
@@ -153,9 +169,6 @@ title "mount / expose current directory as writable"
 
 	popd
 }
-# known issue, https://github.com/wikimedia/fresh/issues/11
-if_mac λ
-
 
 title "mount / cannot write to .git subdirectory file"
 {
