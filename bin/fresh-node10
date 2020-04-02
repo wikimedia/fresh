@@ -88,9 +88,9 @@ $welcometxt_suffix
 $CLR_NONE\""
 runcmd=${FRESH_INTERNAL_RUNCMD:-bash}
 
-docker run --rm --interactive --tty -e 'HOME=/tmp' \
-	--mount type=bind,source="$mountsrc",target="$mountdest",consistency=delegated \
-	$( if [ -n "$bind_git_ro" ]; then printf %s "--mount type=bind,source="$mountsrc"/.git,target="$mountdest"/.git,readonly,consistency=cached"; fi ) \
+podman run --userns=keep-id --rm --interactive --tty -e 'HOME=/tmp' \
+	--mount=type=bind,source="$mountsrc",destination="$mountdest" \
+	$( if [ -n "$bind_git_ro" ]; then printf %s "--mount=type=bind,source="$mountsrc"/.git,destination="$mountdest"/.git"; fi ) \
 	${docker_args[@]+"${docker_args[@]}"} \
 	--entrypoint /bin/sh \
 	"$imagename:$imageversion" \
