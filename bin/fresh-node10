@@ -22,7 +22,10 @@ for arg in "$@"; do
 	case "$arg" in
 		# Option: -env
 		#   Forward "MW_*" and "MEDIAWIKI_*" environment variables from the host machine
-		#   to the Fresh container. This is designed for use with MediaWiki browser tests.
+		#   to the Fresh container. This is designed for use with MediaWiki browser and API tests.
+		#   If a .env file exists in the directory, its MW_* and MEDIAWIKI_* environment
+		#   variables will be forwarded to the container; the variables set in .env
+		#   take precedence over variables set at runtime via e.g. export or .bashrc
 		-env|-e|-env-mw) allow_env_mw=1 ;;
 		# Option: -net
 		#   This exposes network ports from the host machine to the Fresh container.
@@ -56,6 +59,12 @@ if [ -n "$allow_env_mw" ]; then
 	envfile="$(mktemp)"
 	# Backslash for grep bypasses user-defined aliases. – https://github.com/wikimedia/fresh/pull/7
 	env | \grep -E 'MW_|MEDIAWIKI_' > "$envfile"
+	# Copy the .env file contents to the temporary environment file. (T246586)
+	# The .env file contents take precendence over runtime variables from e.g.
+	# export or bashrc.
+	if [ -f .env ]; then
+		\grep -E 'MW_|MEDIAWIKI_' .env >> "$envfile"
+	fi
 	welcometxt_suffix+="# ${CLR_YELLOW}env: MW_*, MEDIAWIKI_*${CLR_NONE}\n"
 	docker_args+=("--env-file" "$envfile")
 	# Teardown: unlink tmp env file, restore window title
