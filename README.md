@@ -12,30 +12,15 @@ _without_ putting your personal data at risk!
 Run the following from a terminal:
 
 ```sh
-curl -s https://raw.githubusercontent.com/wikimedia/fresh/20.02.1/bin/fresh-node10 \
-> /usr/local/bin/fresh-node \
+bash -c 'curl -fsS https://gerrit.wikimedia.org/g/fresh/+/20.02.1/bin/fresh-node10?format=TEXT | base64 --decode > /usr/local/bin/fresh-node \
+&& echo "8e65c8684c552cc8e723ab5c25e93b0d395b5e5d5fd642dc804f3b393b881d0db57b82101a40076b0b51d4bddc4f165ef389dfbd7039a251ee46e0c6842d3bbd  /usr/local/bin/fresh-node" | shasum -c \
 && chmod +x /usr/local/bin/fresh-node \
-&& echo -e '\n\xf0\x9f\x8c\xb1\x20Fresh\x20is\x20now\x20ready\x21\n'
+&& echo -e "\n\xf0\x9f\x8c\xb1\x20Fresh\x20is\x20ready\x21\n"||(echo -e "\xe2\x9d\x8c";false)'
 ```
 
-This will save [fresh-node](/bin/fresh-node10) to `/usr/local/bin/`, and marks the file as executable.
+This will save [fresh-node](/bin/fresh-node10) to the `/usr/local/bin/` directory, verify its integrity, and make it executable.
 
 Programs in this directory automatically become commands you can run from your terminal.
-
-### Integrity
-
-Verify the integrity of your installation by computing the SHA-512 checksum of the installed script. For example, by running `shasum -a 512 /usr/local/bin/fresh-node`. Then, comparing it to the table below.
-
-| Checksum for Fresh 20.02.1
-|--
-| `8e65c86 … 42d3bbd`
-
-Alternatively, run the below script and confirm that it outputs `fresh-node: OK`.
-
-```sh
-integrity=8e65c8684c552cc8e723ab5c25e93b0d395b5e5d5fd642dc804f3b393b881d0db57b82101a40076b0b51d4bddc4f165ef389dfbd7039a251ee46e0c6842d3bbd;
-echo "$integrity  /usr/local/bin/fresh-node" | shasum -c || (echo -e "\xe2\x9d\x8c"; exit 1)
-```
 
 ### What's inside
 
@@ -49,6 +34,20 @@ echo "$integrity  /usr/local/bin/fresh-node" | shasum -c || (echo -e "\xe2\x9d\x
 ### Prerequisites
 
 You'll need to have Docker installed. See [Docker CE for Linux](https://docs.docker.com/install/#server), [Docker for Mac](https://hub.docker.com/editions/community/docker-ce-desktop-mac), or [Docker for Windows](https://docs.docker.com/docker-for-windows/install/).
+
+### Issue tracker
+
+Report bugs or feature requests to [Wikimedia Phabricator](https://phabricator.wikimedia.org/maniphest/task/edit/form/1/?project=wikimedia-fresh).
+
+### Integrity
+
+Verify the integrity of your installation at any time, by running `shasum -a 512 /usr/local/bin/fresh-node` and compre the [SHA-512 checksum](https://en.wikipedia.org/wiki/SHA-512) against the below.
+
+| Checksum for Fresh 20.02.1 |
+|-------|
+| `8e65c8684c…c6842d3bbd` |
+
+To update or repair your copy, simply [re-install Fresh](#quick-start).
 
 ## Usage
 
@@ -111,7 +110,7 @@ reachable.
 
 Any changes made elsewhere in the container, are lost once you exit Fresh.
 
-## Why?
+### Why?
 
 When you open an application or execute a program from the terminal,
 that program can do **anything** that you can do. This should scare you.
