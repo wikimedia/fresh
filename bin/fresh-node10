@@ -45,11 +45,12 @@ for arg in "$@"; do
 done
 
 # Color codes. – http://linux.101hacks.com/ps1-examples/prompt-color-using-tput/
-CLR_NONE=`tput sgr0`
-CLR_BOLD=`tput bold`
-CLR_GREEN=`tput setaf 2`
-CLR_YELLOW=`tput setaf 3`
-CLR_GREY=`tput setaf 7`
+# Tolerate lack of color support. – https://phabricator.wikimedia.org/T251309
+CLR_NONE=$(tput sgr0 2>/dev/null || true)
+CLR_BOLD=$(tput bold 2>/dev/null || true)
+CLR_GREEN=$(tput setaf 2 2>/dev/null || true)
+CLR_YELLOW=$(tput setaf 3 2>/dev/null || true)
+CLR_GREY=$(tput setaf 7 2>/dev/null || true)
 
 if [ -e "$mountsrc/.git" ]; then
 	bind_git_ro=1
