@@ -12,8 +12,10 @@ _without_ putting your personal data at risk!
 Run the following from a terminal:
 
 ```sh
-bash -c 'curl -fsS https://gerrit.wikimedia.org/g/fresh/+/20.02.1/bin/fresh-node10?format=TEXT | base64 --decode > /usr/local/bin/fresh-node \
-&& echo "8e65c8684c552cc8e723ab5c25e93b0d395b5e5d5fd642dc804f3b393b881d0db57b82101a40076b0b51d4bddc4f165ef389dfbd7039a251ee46e0c6842d3bbd  /usr/local/bin/fresh-node" | shasum -c \
+bash -c 'curl -fsS https://gerrit.wikimedia.org/g/fresh/+/20.02.1/bin/fresh-node10?format=TEXT \
+| base64 --decode > /usr/local/bin/fresh-node \
+&& echo "8e65c8684c552cc8e723ab5c25e93b0d395b5e5d5fd642dc804f3b393b881d0db57b82101a40076b0b5\
+1d4bddc4f165ef389dfbd7039a251ee46e0c6842d3bbd  /usr/local/bin/fresh-node" | shasum -c \
 && chmod +x /usr/local/bin/fresh-node \
 && echo -e "\n\xf0\x9f\x8c\xb1\x20Fresh\x20is\x20ready\x21\n"||(echo -e "\xe2\x9d\x8c";false)'
 ```
