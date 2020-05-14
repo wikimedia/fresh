@@ -80,6 +80,8 @@ if [ -n "$allow_net" ]; then
 fi
 if [ -n "$allow_root" ]; then
 	docker_args+=("--user" "root")
+elif [ "$(uname -s)" == "Linux" ]; then
+	docker_args+=("--user" "$(id -u):$(id -g)")
 fi
 
 # Setup: Change window title
