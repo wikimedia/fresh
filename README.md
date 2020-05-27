@@ -12,10 +12,10 @@ _without_ putting your personal data at risk!
 Run the following from a terminal:
 
 ```sh
-bash -c 'curl -fsS https://gerrit.wikimedia.org/g/fresh/+/20.02.1/bin/fresh-node10?format=TEXT \
+bash -c 'curl -fsS https://gerrit.wikimedia.org/g/fresh/+/20.05.1/bin/fresh-node10?format=TEXT \
 | base64 --decode > /usr/local/bin/fresh-node \
-&& echo "8e65c8684c552cc8e723ab5c25e93b0d395b5e5d5fd642dc804f3b393b881d0db57b82101a40076b0b5\
-1d4bddc4f165ef389dfbd7039a251ee46e0c6842d3bbd  /usr/local/bin/fresh-node" | shasum -c \
+&& echo "81417b941cb8fd16232d318c5672cc1420df241f720b588b2669f83e11cd9ed25e732ac10a20c35fd74\
+53c1f488e75d868d288bdfd008bb4e3c073713a707626  /usr/local/bin/fresh-node" | shasum -c \
 && chmod +x /usr/local/bin/fresh-node \
 && echo -e "\n\xf0\x9f\x8c\xb1\x20Fresh\x20is\x20ready\x21\n"||(echo -e "\xe2\x9d\x8c";false)'
 ```
@@ -45,9 +45,9 @@ Report bugs or feature requests to [Wikimedia Phabricator](https://phabricator.w
 
 Verify the integrity of your installation at any time, by running `shasum -a 512 /usr/local/bin/fresh-node` and compre the [SHA-512 checksum](https://en.wikipedia.org/wiki/SHA-512) against the below.
 
-| Checksum for Fresh 20.02.1 |
+| Checksum for Fresh 20.05.1 |
 |-------|
-| `8e65c8684c…c6842d3bbd` |
+| `81417b941c…713a707626` |
 
 To update or repair your copy, simply [re-install Fresh](#quick-start).
 

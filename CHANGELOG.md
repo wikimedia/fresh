@@ -1,3 +1,24 @@
+20.05.1 / 2020-05-28
+==================
+
+### Added
+
+* The `-env` option now also reads and forwards variables from a `.env`
+  file in the current directory. (Kosta Harlan) [#16](https://github.com/wikimedia/fresh/issues/16)
+
+### Changed
+
+* On Linux, the container now runs as your host user/group rather than as the
+  unknown 1001 uid. This means the mounted directory is as read-writable
+  within the container as it is outside, matching how Fresh works with
+  Docker for Mac. (Stephen Niedzielski) [#11](https://github.com/wikimedia/fresh/issues/11)
+
+### Fixed
+
+* Fix launch in host environments without `tput` installed. (Timo Tijhof) [T251309](https://phabricator.wikimedia.org/T251309)
+* Fix launch in terminals that only support bold/greyscale markup. (Timo Tijhof) [T251309](https://phabricator.wikimedia.org/T251309)
+* Fix mounted directory being writable on Linux. (Kosta Harlan) [#11](https://github.com/wikimedia/fresh/issues/11)
+
 20.02.1 / 2020-02-08
 ==================
 
