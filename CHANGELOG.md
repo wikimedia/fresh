@@ -1,3 +1,16 @@
+20.08.1 / 2020-08-27
+==================
+
+### Changed
+
+* Bump Docker image to `node10-test-browser:0.6.2`. (Antoine Musso)
+  * Updated npm from 6.5.0 to 6.14.5.
+  * Updated Mozilla Firefox from 68.3.0esr to 68.11.0esr.
+
+### Fixed
+
+* Make file writes work on SELinux by disabling its "security labels" from Docker.
+
 20.05.1 / 2020-05-28
 ==================
 
