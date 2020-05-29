@@ -38,7 +38,7 @@ You'll need to have Docker installed. See [Docker CE for Linux](https://docs.doc
 
 ### Issue tracker
 
-Report bugs or feature requests to [Wikimedia Phabricator](https://phabricator.wikimedia.org/maniphest/task/edit/form/1/?project=wikimedia-fresh).
+Report bugs or feature requests to [Wikimedia Phabricator](https://phabricator.wikimedia.org/tag/fresh/).
 
 ### Integrity
 
