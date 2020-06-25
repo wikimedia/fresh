@@ -45,7 +45,7 @@ The various options before it decide how the container is configured:
   container's bash prompt.
 
 * `-e 'HOME=/tmp'`: The Wikimedia base images run as the unprivileged
-  `nobody` user inside the container, which as no home directory.
+  `nobody` user inside the container, which has no home directory.
   This is for compatibility with various CLI utilities that assume
   the `$HOME` directory to exist.
 
