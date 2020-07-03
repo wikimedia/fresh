@@ -110,6 +110,7 @@ docker run --rm -e 'HOME=/tmp' \
 	$( if [ -n "$bind_git_ro" ]; then printf %s "--mount type=bind,source="$mountsrc"/.git,target="$mountdest"/.git,readonly,consistency=cached"; fi ) \
 	${docker_args[@]+"${docker_args[@]}"} \
 	--entrypoint /bin/sh \
+	--security-opt label=disable \
 	"$imagename:$imageversion" \
 	-c "cd $mountdest/;$welcomecmd;$runcmd"
 
