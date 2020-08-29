@@ -9,7 +9,7 @@
 
 ### Fixed
 
-* Make file writes work on SELinux by disabling its "security labels" from Docker.
+* Make file writes work on SELinux by disabling its "security labels" from Docker. (Marius Hoch)
 
 20.05.1 / 2020-05-28
 ==================
