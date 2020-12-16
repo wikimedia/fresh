@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.com/wikimedia/fresh.svg?branch=master)](https://travis-ci.com/wikimedia/fresh)
-
 # 🌱  Fresh environment
 
 A **Fresh** environment is a fast and ready-to-use Docker container with
