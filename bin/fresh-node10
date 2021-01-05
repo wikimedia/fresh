@@ -18,7 +18,11 @@ allow_env_mw=
 allow_env_sauce=
 allow_net=
 allow_root=
+use_podman=
 bind_git_ro=
+bind_fastwrite=',consistency=delegated'
+bind_fastread=',consistency=cached'
+DOCKER_BIN=docker
 for arg in "$@"; do
 	case "$arg" in
 		# Option: -env-mw
@@ -41,9 +45,13 @@ for arg in "$@"; do
 		#   Log into to the Fresh container user 'root' instead of 'nobody'.
 		#   This means you can use sudo commands inside the container, such as apt-get.
 		-root) allow_root=1 ;;
+		# Option: -podman
+		#   Force use of Podman instead of Docker.
+		#   By default, Fresh uses whichever runtime is available, selecting Docker if both are.
+		-podman) use_podman=1 ;;
 		*)
 		echo "unknown option: $arg" 1>&2
-		echo "usage: fresh-node [-env-mw] [-env-sauce] [-net] [-root]" 1>&2
+		echo "usage: fresh-node [-env-mw] [-env-sauce] [-net] [-root] [-podman]" 1>&2
 		exit 1
 		;;
 	esac
@@ -56,11 +64,27 @@ CLR_BOLD=$(tput bold 2>/dev/null || true)
 CLR_RED=$(tput setaf 1 2>/dev/null || true)
 CLR_GREEN=$(tput setaf 2 2>/dev/null || true)
 CLR_YELLOW=$(tput setaf 3 2>/dev/null || true)
+CLR_PINK=$(tput setaf 5 2>/dev/null || true)
 CLR_GREY=$(tput setaf 7 2>/dev/null || true)
 
 if [ -e "$mountsrc/.git" ]; then
 	bind_git_ro=1
 	welcometxt_suffix+="#        $mountdest/.git ➟ $mountsrc/.git (read-only)\n"
+fi
+if [ -z "$use_podman" ]; then
+	# Prefer `hash` over `which` or `command` for improved portability and
+	# performance, specific to Bash. - https://stackoverflow.com/a/677212/319266
+	if ! hash docker 2>/dev/null && hash podman 2>/dev/null; then
+		use_podman=1
+	fi
+fi
+if [ -n "$use_podman" ]; then
+	DOCKER_BIN=podman
+	# The 'consistency' bind options are not supported by Podman.
+	# - https://phabricator.wikimedia.org/T259974#6713393
+	bind_fastwrite=
+	bind_fastread=
+	welcometxt_suffix+="# ${CLR_PINK}runtime: podman${CLR_NONE}\n"
 fi
 if [ -n "$allow_env_mw" ] || [ -n "$allow_env_sauce" ]; then
 	envfile="$(mktemp)"
@@ -97,6 +121,11 @@ if [ -n "$allow_root" ]; then
 	docker_args+=("--user" "root")
 elif [ "$(uname -s)" == "Linux" ]; then
 	docker_args+=("--user" "$(id -u):$(id -g)")
+	if [ -n "$use_podman" ]; then
+		# Make sure host UID/GID are mapped into container,
+		# see podman-run(1) manual.
+		docker_args+=("--userns=keep-id")
+	fi
 fi
 
 # Setup: Change window title
@@ -124,9 +153,9 @@ fi
 # which would be misinterpreted as docker-run argument.
 # See <https://stackoverflow.com/a/7577209/319266>
 
-docker run --rm -e 'HOME=/tmp' \
-	--mount type=bind,source="$mountsrc",target="$mountdest",consistency=delegated \
-	$( if [ -n "$bind_git_ro" ]; then printf %s "--mount type=bind,source="$mountsrc"/.git,target="$mountdest"/.git,readonly,consistency=cached"; fi ) \
+$DOCKER_BIN run --rm -e 'HOME=/tmp' \
+	--mount type=bind,source="$mountsrc",target="$mountdest"$bind_fastwrite \
+	$( if [ -n "$bind_git_ro" ]; then printf %s "--mount type=bind,source="$mountsrc"/.git,target="$mountdest"/.git,readonly"$bind_fastread; fi ) \
 	${docker_args[@]+"${docker_args[@]}"} \
 	--entrypoint /bin/sh \
 	--security-opt label=disable \
@@ -148,6 +177,6 @@ docker run --rm -e 'HOME=/tmp' \
 # #           \$(firefox --version)
 # #           \$(jsduck --version) \$(ruby --version)
 # $CLR_NONE\""
-# docker run --rm --interactive --tty --entrypoint /bin/sh \
+# $DOCKER_BIN run --rm --interactive --tty --entrypoint /bin/sh \
 #  "$imagename:$imageversion" \
 #  -c "$welcomecmd;false"
