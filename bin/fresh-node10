@@ -15,18 +15,23 @@ docker_args=()
 
 # Parse options
 allow_env_mw=
+allow_env_sauce=
 allow_net=
 allow_root=
 bind_git_ro=
 for arg in "$@"; do
 	case "$arg" in
-		# Option: -env
+		# Option: -env-mw
 		#   Forward "MW_*" and "MEDIAWIKI_*" environment variables from the host machine
 		#   to the Fresh container. This is designed for use with MediaWiki browser and API tests.
 		#   If a .env file exists in the directory, its MW_* and MEDIAWIKI_* environment
 		#   variables will be forwarded to the container; the variables set in .env
 		#   take precedence over variables set at runtime via e.g. export or .bashrc
-		-env|-e|-env-mw) allow_env_mw=1 ;;
+		-e|-env|-env-mw) allow_env_mw=1 ;;
+		# Option: -env-sauce
+		#   Forward "SAUCE_*" environment variables from the host machine to the Fresh container.
+		#   This is designed for debugging browser tests involving webdriver and SauceLabs.
+		-env-sauce) allow_env_sauce=1 ;;
 		# Option: -net
 		#   This exposes network ports from the host machine to the Fresh container.
 		#   For example, to enable access to a MediaWiki web server.
@@ -38,7 +43,7 @@ for arg in "$@"; do
 		-root) allow_root=1 ;;
 		*)
 		echo "unknown option: $arg" 1>&2
-		echo "usage: fresh-node [-env] [-net] [-root]" 1>&2
+		echo "usage: fresh-node [-env-mw] [-env-sauce] [-net] [-root]" 1>&2
 		exit 1
 		;;
 	esac
@@ -48,6 +53,7 @@ done
 # Tolerate lack of color support. – https://phabricator.wikimedia.org/T251309
 CLR_NONE=$(tput sgr0 2>/dev/null || true)
 CLR_BOLD=$(tput bold 2>/dev/null || true)
+CLR_RED=$(tput setaf 1 2>/dev/null || true)
 CLR_GREEN=$(tput setaf 2 2>/dev/null || true)
 CLR_YELLOW=$(tput setaf 3 2>/dev/null || true)
 CLR_GREY=$(tput setaf 7 2>/dev/null || true)
@@ -56,10 +62,18 @@ if [ -e "$mountsrc/.git" ]; then
 	bind_git_ro=1
 	welcometxt_suffix+="#        $mountdest/.git ➟ $mountsrc/.git (read-only)\n"
 fi
-if [ -n "$allow_env_mw" ]; then
+if [ -n "$allow_env_mw" ] || [ -n "$allow_env_sauce" ]; then
 	envfile="$(mktemp)"
+	docker_args+=("--env-file" "$envfile")
+	# Teardown: unlink tmp env file, restore window title
+	trap "rm -f \"$envfile\"; echo -e '\033]2;\007'" 0 SIGTERM SIGINT
+else
+	# Teardown: restore window title
+	trap "echo -e '\033]2;\007'" 0 SIGTERM SIGINT
+fi
+if [ -n "$allow_env_mw" ]; then
 	# Backslash for grep bypasses user-defined aliases. – https://github.com/wikimedia/fresh/pull/7
-	env | \grep -E 'MW_|MEDIAWIKI_' > "$envfile"
+	env | \grep -E 'MW_|MEDIAWIKI_' >> "$envfile"
 	# Copy the .env file contents to the temporary environment file. (T246586)
 	# The .env file contents take precendence over runtime variables from e.g.
 	# export or bashrc.
@@ -67,12 +81,13 @@ if [ -n "$allow_env_mw" ]; then
 		\grep -E 'MW_|MEDIAWIKI_' .env >> "$envfile"
 	fi
 	welcometxt_suffix+="# ${CLR_YELLOW}env: MW_*, MEDIAWIKI_*${CLR_NONE}\n"
-	docker_args+=("--env-file" "$envfile")
-	# Teardown: unlink tmp env file, restore window title
-	trap "rm -f \"$envfile\"; echo -e '\033]2;\007'" 0 SIGTERM SIGINT
-else
-	# Teardown: restore window title
-	trap "echo -e '\033]2;\007'" 0 SIGTERM SIGINT
+fi
+if [ -n "$allow_env_sauce" ]; then
+	if env | \grep -E 'SAUCE_' >> "$envfile"; then
+		welcometxt_suffix+="# ${CLR_YELLOW}env: SAUCE_*${CLR_NONE}\n"
+	else
+		welcometxt_suffix+="# ${CLR_RED}env: SAUCE_* (none found)${CLR_NONE}\n"
+	fi
 fi
 if [ -n "$allow_net" ]; then
 	welcometxt_suffix+="# ${CLR_YELLOW}net: expose host${CLR_NONE}\n"
