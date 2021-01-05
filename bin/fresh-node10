@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 #
-# Fresh <https://github.com/wikimedia/fresh>
+# Fresh <https://gerrit.wikimedia.org/g/fresh>
 #
 # This is free and unencumbered software released into the public domain.
 
