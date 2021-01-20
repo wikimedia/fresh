@@ -48,9 +48,6 @@ assert_lastline() {
 
 cleanup() {
 	rm -rf ./fixtures
-	if [ -f .env ]; then
-		rm .env
-	fi
 }
 cleanup
 trap cleanup 0 ERR
@@ -103,17 +100,27 @@ title "environment / inherit MEDIAWIKI_FOO with -env"
 
 title "environment / inherit MEDIAWIKI_BAR .env file with -env"
 {
+	mkdir -p fixtures/10-env
+	pushd fixtures/10-env
 	echo "MEDIAWIKI_BAR=inherited" > .env
-	result=$(FRESH_INTERNAL_RUNCMD='echo $MEDIAWIKI_BAR' ./bin/fresh-node10 -env)
+
+	result=$(FRESH_INTERNAL_RUNCMD='echo $MEDIAWIKI_BAR' $BASE/bin/fresh-node10 -env)
 	assert_lastline "$result" "inherited"
+
+	popd
 }
 
 title "environment / inherit MEDIAWIKI_BAZ .env file with -env, overriding exported var"
 {
+	mkdir -p fixtures/20-env
+	pushd fixtures/20-env
+
 	export MEDIAWIKI_BAZ="inherited"
 	echo "MEDIAWIKI_BAZ=overridden" > .env
-	result=$(FRESH_INTERNAL_RUNCMD='echo $MEDIAWIKI_BAZ' ./bin/fresh-node10 -env)
+	result=$(FRESH_INTERNAL_RUNCMD='echo $MEDIAWIKI_BAZ' $BASE/bin/fresh-node10 -env)
 	assert_lastline "$result" "overridden"
+
+	popd
 }
 
 title "environment / protect FOO even with -env"
