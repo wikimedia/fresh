@@ -87,6 +87,17 @@ title "environment / default CHROMIUM_FLAGS"
 	assert_lastline "$result" "--no-sandbox"
 }
 
+title "environment / warn if no MW_ vars with -env-mw"
+{
+	mkdir -p fixtures/10-env-mw
+	pushd fixtures/10-env-mw
+
+	result=$(FRESH_INTERNAL_RUNCMD='exit' $BASE/bin/fresh-node10 -env-mw)
+	assert_contains "$result" "env: MW_*, MEDIAWIKI_* (none found)"
+
+	popd
+}
+
 title "environment / protect FOO by default"
 {
 	export FOO="inherited"

@@ -97,14 +97,18 @@ else
 fi
 if [ -n "$allow_env_mw" ]; then
 	# Backslash for grep bypasses user-defined aliases. – https://github.com/wikimedia/fresh/pull/7
-	env | \grep -E 'MW_|MEDIAWIKI_' >> "$envfile"
-	# Copy the .env file contents to the temporary environment file. (T246586)
-	# The .env file contents take precendence over runtime variables from e.g.
-	# export or bashrc.
+	mwenvtext=$(env | \grep -E 'MW_|MEDIAWIKI_' || true)
+	# Also consider any ".env" file in the current working directory (T246586)
+	# The env file takes precendence over runtime variables from bash exports or bashrc.
 	if [ -f .env ]; then
-		\grep -E 'MW_|MEDIAWIKI_' .env >> "$envfile"
+		mwenvtext="${mwenvtext}\n$(\grep -E 'MW_|MEDIAWIKI_' .env)"
 	fi
-	welcometxt_suffix+="# ${CLR_YELLOW}env: MW_*, MEDIAWIKI_*${CLR_NONE}\n"
+	# Check if we got at least one non-empty non-whitespace line
+	if printf "$mwenvtext" | grep "\S" >> "$envfile"; then
+		welcometxt_suffix+="# ${CLR_YELLOW}env: MW_*, MEDIAWIKI_*${CLR_NONE}\n"
+	else
+		welcometxt_suffix+="# ${CLR_RED}env: MW_*, MEDIAWIKI_* (none found)${CLR_NONE}\n"
+	fi
 fi
 if [ -n "$allow_env_sauce" ]; then
 	if env | \grep -E 'SAUCE_' >> "$envfile"; then
