@@ -1,8 +1,17 @@
-#!/bin/bash -eu
+#!/usr/bin/env -S -i /bin/bash
 
-BASE=$(dirname "$(readlink -f "$0")")
+set -e
+set -u
+
+BASE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ISMAC=$(test "$(uname -s)" = "Darwin" && echo "1" || echo "")
 ISLINUX=$(test "$(uname -s)" = "Linux" && echo "1" || echo "")
+
+# We use `env -i` to disable inheritance of environment variables from
+# the developer's own command-line, so that test cases are in control
+# over what is and isn't set. But, this means PATH is also cleared.
+# Add at least /usr/local, because Docker or Podman may be there.
+export PATH="$PATH:/usr/local/bin/"
 
 cd $BASE
 
@@ -44,6 +53,14 @@ assert() {
 
 assert_lastline() {
 	assert "$(echo "$1" | tail -n2 | trim)" "$2"
+}
+
+assert_contains() {
+	printf "      contains \"$2\"\n"
+	if [[ "$1" != *"$2"* ]]; then
+		printf "\n$1"
+		false
+	fi
 }
 
 cleanup() {
@@ -119,6 +136,18 @@ title "environment / inherit MEDIAWIKI_BAZ .env file with -env, overriding expor
 	echo "MEDIAWIKI_BAZ=overridden" > .env
 	result=$(FRESH_INTERNAL_RUNCMD='echo $MEDIAWIKI_BAZ' $BASE/bin/fresh-node10 -env)
 	assert_lastline "$result" "overridden"
+
+	popd
+}
+
+title "environment / warn if no SAUCE_ vars with -env-sauce"
+{
+	mkdir -p fixtures/30-env
+	pushd fixtures/30-env
+
+	export MEDIAWIKI_FOO="FOO"
+	result=$(FRESH_INTERNAL_RUNCMD='exit' $BASE/bin/fresh-node10 -env-sauce)
+	assert_contains "$result" "env: SAUCE_* (none found)"
 
 	popd
 }
