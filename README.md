@@ -10,9 +10,9 @@ _without_ putting your personal data at risk!
 Run the following from a terminal:
 
 ```sh
-bash -c 'curl -fsS https://gerrit.wikimedia.org/g/fresh/+/20.08.1/bin/fresh-node10?format=TEXT \
+bash -c 'curl -fsS https://gerrit.wikimedia.org/g/fresh/+/21.01.1/bin/fresh-node10?format=TEXT \
 | base64 --decode > /usr/local/bin/fresh-node \
-&& echo "45a5b28a3eb38c1136902edac57a7570a251db99e4e936721d0b2a3572ddfc71  /usr/local/bin/fresh-node" | shasum -c \
+&& echo "1bd70d4235b05d411921f685e4a66784cf066278e8dd3207d356159aca986bb4  /usr/local/bin/fresh-node" | shasum -a 256 -c \
 && chmod +x /usr/local/bin/fresh-node \
 && echo -e "\n\xf0\x9f\x8c\xb1\x20Fresh\x20is\x20ready\x21\n"||(echo -e "\xe2\x9d\x8c";false)'
 ```
@@ -34,6 +34,8 @@ Programs in this directory automatically become commands you can run from your t
 
 You'll need to have Docker installed. See [Docker CE for Linux](https://docs.docker.com/install/#server), [Docker for Mac](https://hub.docker.com/editions/community/docker-ce-desktop-mac), or [Docker for Windows](https://docs.docker.com/docker-for-windows/install/).
 
+On Linux, [Podman](https://podman.io/) can also be used.
+
 ### Issue tracker
 
 Report bugs or feature requests to [Wikimedia Phabricator](https://phabricator.wikimedia.org/tag/fresh/).
@@ -42,9 +44,9 @@ Report bugs or feature requests to [Wikimedia Phabricator](https://phabricator.w
 
 Verify the integrity of your installation at any time, by running `shasum -a 256 /usr/local/bin/fresh-node` and compare the [SHA-256 checksum](https://en.wikipedia.org/wiki/SHA-256) against the below.
 
-| Checksum for Fresh 20.08.1 |
+| Checksum for Fresh 21.01.1 |
 |-------|
-| `45a5b28a3eb38c1136902edac57a7570a251db99e4e936721d0b2a3572ddfc71` |
+| `1bd70d4235b05d411921f685e4a66784cf066278e8dd3207d356159aca986bb4` |
 
 To update or repair your copy, simply [re-install Fresh](#quick-start).
 

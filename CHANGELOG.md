@@ -1,3 +1,15 @@
+21.01.1 / 2021-01-27
+==================
+
+### Added
+
+* Add `--env-sauce` flag to support forwarding SAUCE_ environment variables (Timo Tijhof)
+* Add support for Podman, an alternative container execution tool to Docker (Timo Tijhof & Kunal Mehta) [T259974](https://phabricator.wikimedia.org/T259974)
+
+### Changed
+
+* The `-env` option will emit a warning if no MW environment variables are found. (Timo Tijhof)
+
 20.08.1 / 2020-08-27
 ==================
 
