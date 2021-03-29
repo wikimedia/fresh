@@ -1,0 +1,124 @@
+#!/usr/bin/env -S -i /bin/bash
+
+set -e
+set -u
+
+# We use `env -i` to disable inheritance of environment variables from
+# the developer's own command-line, so that tests have a clean and stable
+# starting point for test cases to take control of.
+
+BASE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+cd $BASE
+
+trim() {
+	read input
+	echo -n "${input%%[[:space:]]}"
+}
+
+pushd() {
+	# quiet
+	command pushd "$1" > /dev/null
+}
+
+popd() {
+	# quiet
+	command popd > /dev/null
+}
+
+title() {
+	clean_fs
+
+	echo
+	echo "fresh-npm test: $1..."
+}
+
+assert_equals() {
+	actual="$1"
+	expected="$2"
+	if [[ "$actual" == "$expected" ]]; then
+		printf "      equals \"$expected\"\n"
+	else
+		printf "      \"${actual}\" == \"${expected}\"\n"
+		false
+	fi
+}
+
+assert_lastline() {
+	assert_equals "$(echo "$1" | tail -n2 | trim)" "$2"
+}
+
+assert_contains() {
+	printf "      contains \"$2\"\n"
+	if [[ "$1" != *"$2"* ]]; then
+		printf "\n$1"
+		false
+	fi
+}
+
+clean_fs() {
+	rm -rf ./fixtures
+}
+trap clean_fs 0 ERR
+
+title "default response"
+{
+	result=$(NPM_BIN=/opt/npm bin/fresh-npm)
+	assert_contains "$result" "Host is secured from risky npm commands"
+	assert_contains "$result" "Enabled commands:"
+	assert_contains "$result" "fresh-npm@2"
+	assert_contains "$result" "To bypass, run /opt/npm"
+}
+
+title "deny npm-install"
+{
+	result=$(bin/fresh-npm install) || code="$?"
+	assert_contains "$result" "command 'install' is disabled or unknown."
+	assert_contains "$result" "Enabled commands:"
+	assert_equals "$code" "1"
+}
+
+title "allow npm-version"
+{
+
+	mkdir -p fixtures/
+	pushd fixtures/
+	printf '#!/bin/sh\necho 0.0.0' > mock_npm
+	chmod +x mock_npm
+	popd
+
+	result=$(NPM_BIN=fixtures/mock_npm bin/fresh-npm --version)
+	assert_lastline "$result" "0.0.0"
+}
+
+title "deny npm-publish with prepare script"
+{
+
+	mkdir -p fixtures/
+	pushd fixtures/
+	echo '{ "scripts": { "prepare": "npm run build" } }' > package.json
+	printf '#!/bin/sh\necho "Boo!"' > mock_npm
+	chmod +x mock_npm
+
+	result=$(NPM_BIN=./mock_npm "$BASE/bin/fresh-npm" publish 2>&1) || code="$?"
+	assert_lastline "$result" "fresh-npm detected a publish script. Aborting."
+	assert_equals "$code" "1"
+
+	popd
+}
+
+
+title "allow npm-publish"
+{
+
+	mkdir -p fixtures/
+	pushd fixtures/
+	echo '{ "scripts": { "test": "true" } }' > package.json
+	printf '#!/bin/sh\necho "Yay!"' > mock_npm
+	chmod +x mock_npm
+
+	result=$(NPM_BIN=./mock_npm "$BASE/bin/fresh-npm" publish 2>&1)
+	assert_lastline "$result" "Yay!"
+
+	popd
+}

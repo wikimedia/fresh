@@ -1,0 +1,177 @@
+#!/usr/bin/env python3
+"""
+fresh-npm <https://gerrit.wikimedia.org/g/fresh>
+
+Copyright Timo Tijhof
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
+
+import json
+import os
+import subprocess
+import sys
+
+scriptversion='24.0.0-alpha'
+
+# fresh-npm is a security-focussed replacement for the "npm" command. It is installed
+# in your home directory, so that on your terminal "npm" resolves to fresh-npm instead
+# of the real one. The real npm can still be used by using its full name. For convenience,
+# the full path to npm is reported at the end of any `fresh-npm` command output
+#
+# Purpose:
+#
+# * Our primary security measure is that only known safe npm commands are forwarded
+#   by fresh-npm to the real npm. Safe commands include `npm owner` and `npm publish`.
+#   Other commands, which download or execute unaudited code from the Internet, should
+#   run in an isolated container instead (e.g. fresh-node, where only the real npm is).
+#
+#   If you accidentally run an unsafe command like `npm install` directly on your host,
+#   then fresh-npm catches it for you. You can then open fresh-node (or other enviornment)
+#   and try it again.
+#
+# * Of the safe commands, there is one command known to (by default) execute package.json
+#   scripts, this is "npm publish". fresh-npm wraps this command such that the real npm and
+#   its Node.js process don't even start until after it has been verified that there are no
+#   lifecycle scripts in the current directory's package.json, that hook into this command.
+#
+#   If your project requires a build script, define this via a "build" commmand instead, and
+#   execute it like "npm run build" before publishing.
+#
+# * As further defense in-depth, while it the above should suffice in theory,
+#   we also tell npm via environment variables <https://docs.npmjs.com/cli/v7/using-npm/config>
+#   - disable execution of `.git/hooks` shell scripts (e.g. npm-version),
+#   - disable executable hooks (e.g. npm-run),
+#   - disable lifecycle scripts (e.g. npm-publish),
+#   - disable downloading of new code (e.g. npm-install),
+#   - disable modification of manifest files (e.g. npm-update).
+
+#
+os.environ["npm_config_commit_hooks"] = 'false'
+os.environ["npm_config_ignore_scripts"] = 'true'
+os.environ["npm_config_offline"] = 'true'
+os.environ["npm_config_omit"] = 'dev'
+os.environ["npm_config_save"] = 'false'
+os.environ["npm_config_update"] = 'false'
+
+# Inspired by https://gerrit.wikimedia.org/g/mediawiki/tools/scap/+/3.16.0/scap/ansi.py#26
+# https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
+clr_none = "\x1b[%sm" % (0)
+clr_bold = "\x1b[%sm" % (1)
+clr_red = "\x1b[%sm" % (31)
+clr_green = "\x1b[%sm" % (32)
+clr_yellow = "\x1b[%sm" % (33)
+clr_grey = "\x1b[%sm" % (37)
+
+def get_raw_npm():
+	bin = os.environ.get('NPM_BIN')
+	if bin is not None:
+		return bin
+	for bin in (
+		'/opt/homebrew/bin/npm',
+		'/usr/local/bin/npm',
+		'/usr/bin/npm',
+		'/bin/npm'
+	):
+		if os.access(bin, os.X_OK):
+			return bin
+	print('fresh-npm: unable to find npm', file=sys.stderr)
+	sys.exit(1)
+
+def raw_npm(args):
+	npm = get_raw_npm()
+	try:
+		subprocess.run([npm, *args], shell=False, check=True)
+	except subprocess.CalledProcessError as e:
+		sys.exit(e.returncode)
+
+def banner():
+	print('%s# fresh-npm ░ %sHost is secured from risky npm commands%s ░ 🌱 %sFresh %s%s\n' % (
+		clr_grey,
+		clr_yellow,
+		clr_grey,
+		clr_bold + clr_green,
+		scriptversion,
+		clr_none
+	))
+
+def usage():
+	banner()
+	print('Usage: npm [--version] <command> [-h]')
+	print('')
+	print('Enabled commands:')
+	print('')
+	print('  npm adduser           login to the registry for publishing, stores credentials in ~/.npmrc.')
+	print('                        aliases: login, add-user')
+	print('  npm logout            log out of the registry.')
+	print('  npm owner             manage package owners')
+	print('  npm publish           publish a package.')
+	print('  npm whoami            show your npm username.')
+	print('  npm <command> -h      quick help for a command.')
+	print('  npm help              show documentation package.')
+	print('  npm help <term>       show usage info for a command.')
+	print('  npm [-v | --version]  print npm version.')
+	print('')
+	print('fresh-npm@%s %s' % (scriptversion, sys.argv[0]))
+	print('To bypass, run %s' % get_raw_npm())
+	print('')
+
+
+if len(sys.argv) <= 1:
+	usage()
+elif sys.argv[1] in ('adduser', 'login', 'add-user', 'logout', 'owner', 'whoami', '-v', '--version'):
+	raw_npm(sys.argv[1:])
+elif sys.argv[1] == 'publish':
+	pgk_file_name = 'package.json'
+	if not os.path.exists(pgk_file_name):
+		print("fresh-npm: no package.json found.", file=sys.stderr)
+		sys.exit(1)
+	with open(pgk_file_name) as f:
+		pkg = json.load(f)
+		pgk_scripts = pkg.get('scripts');
+		# https://docs.npmjs.com/cli/v7/using-npm/scripts#npm-publish
+		if pgk_scripts:
+			for script in (
+				'prepack', 'pack', 'postpack', 'prepare', 'prepublish',
+				'prepublishOnly', 'publish', 'postpublish'
+			):
+				if pgk_scripts.get(script) is not None:
+					print('fresh-npm detected a publish script. Aborting.', file=sys.stderr)
+					sys.exit(1)
+
+	raw_npm(sys.argv[1:])
+elif sys.argv[1] == 'help':
+	if len(sys.argv) <= 2:
+		# replace 'npm help'
+		usage()
+	else:
+		# forward 'npm help <term>'
+		raw_npm(sys.argv[1:])
+else:
+	print('')
+	print('%sfresh-npm %sERR!%s  command \'%s\' is disabled or unknown.' % (
+		clr_grey,
+		clr_red,
+		clr_none,
+		sys.argv[1][0:10]
+	))
+	print('')
+	usage()
+	sys.exit(1)

@@ -25,6 +25,8 @@ clean_env() {
 
 cd $BASE
 
+./tests/test-fresh-npm
+
 trim() {
 	read input
 	echo -n "${input%%[[:space:]]}"
@@ -45,7 +47,7 @@ title() {
 	clean_env
 
 	echo
-	echo "test: $1..."
+	echo "fresh-node test: $1..."
 }
 
 if_mac() {

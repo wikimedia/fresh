@@ -33,29 +33,53 @@ bin_candidates = [
     # https://unix.stackexchange.com/a/392710/37512
     '~/bin',
 ]
-bin_dir = None
+# limit location candidates for fresh-npm because:
+# - install_bin() must not overwrite the real npm,
+# - absent_bin() must not delete the real npm,
+# - fresh-npm:get_raw_npm() must remain able to find and point to
+#   the path of the real npm (i.e. not misakenly point to itself).
+#
+# The downside is that, a subset of Intel Macs users may now have to do
+# a one-time setup to add HOME to their PATH. This does not affect other
+# users because for this to be needed you would need to:
+# 1. not have HOME in PATH by default (i.e. Linux),
+# 2. not yet added it yourself by now,
+# 3. have a non-root owned writable /usr/local (Homebrew on macOS makes
+#    it writable during its installation), and
+# 4. are not on Apple ARM devices where Homebrew uses /opt instead.
+#
+# Everyone else either gets it by default, or did it already, or needs to do
+# it regardless even for fresh-node.
+npm_bin_candidates = [
+    '~/.local/bin',
+    '~/bin',
+]
 
-
-def install_bin_all():
+def install_bin_all(secure_npm=False):
     """
     Download, verify, and install a shell command.
     """
 
     # During development this can be a recent commit hash instead of a release tag,
     # to allow full testing prior to release.
-    FRESH_VERSION='23.08.1'
+    FRESH_VERSION='3692cb7553eff7f8120acd16f0b6f080027b2273'
     FRESH_NODE14_SHA256='da94d320c55363ba2bad58779b38d2797e90353aa1e35a57bcb7eac121918d9a'
     FRESH_NODE16_SHA256='19cb6a409c8f1c151daf2e8c5d5facaea8108cba6f9560df88c2aaef869fb995'
     FRESH_NODE18_SHA256='03b73a224bc041e12d9fa3184ecca9ca257156cf766a0486562ac319313239ee'
     FRESH_NODE20_SHA256='22255f6fb6289108780c076f03c3bfa95c1bd81e69ed2dc264c80eb5c3036324'
+    FRESH_NPM_SHA256='26d30fe47a9a7899d113c07f9de9076522198be8c828801e817a51525fd83bef'
 
     # Run get_bin_path first to improve message order
     # e.g. not "creating dir" between two "installing" messages
-    get_bin_path()
+    get_bin_path(bin_candidates)
     install_bin(FRESH_VERSION, 'fresh-node14', FRESH_NODE14_SHA256, 'fresh-node14')
     install_bin(FRESH_VERSION, 'fresh-node16', FRESH_NODE16_SHA256, 'fresh-node16')
     install_bin(FRESH_VERSION, 'fresh-node18', FRESH_NODE18_SHA256, 'fresh-node')
     install_bin(FRESH_VERSION, 'fresh-node20', FRESH_NODE20_SHA256, 'fresh-node20')
+    if secure_npm:
+        install_bin(FRESH_VERSION, 'fresh-npm', FRESH_NPM_SHA256, 'npm')
+    else:
+        absent_bin('npm', 'gerrit.wikimedia.org/g/fresh', 'fresh-npm')
 
     absent_bin('fresh-node10')
     absent_bin('fresh-node12')
@@ -73,6 +97,7 @@ def debug_checksums():
     make_checksum('fresh-node16')
     make_checksum('fresh-node18')
     make_checksum('fresh-node20')
+    make_checksum('fresh-npm')
 
 
 def warning(message):
@@ -86,7 +111,11 @@ def error_exit(message):
 
 
 def install_bin(version_src, cmd_src, cmd_integrity, cmd_dest):
-    dest = os.path.join(get_bin_path(), cmd_dest)
+    if cmd_src == 'fresh-npm':
+        dest = os.path.join(get_bin_path(npm_bin_candidates), cmd_dest)
+    else:
+        dest = os.path.join(get_bin_path(bin_candidates), cmd_dest)
+
     print('%sinstalling %s to %s%s' % (clr_grey, cmd_src, dest, clr_none))
 
     # Download
@@ -121,45 +150,50 @@ def install_bin(version_src, cmd_src, cmd_integrity, cmd_dest):
     os.chmod(dest, current.st_mode | stat.S_IEXEC)
 
 
-def get_bin_path():
-    global bin_dir
-
-    if bin_dir is None:
-        bin_dir = False
-        for candidate in bin_candidates:
-            candidate = os.path.expanduser(candidate)
-            if not candidate in os.get_exec_path():
+def get_bin_path(candidates):
+    bin_dir = False
+    for candidate in candidates:
+        candidate = os.path.expanduser(candidate)
+        if not candidate in os.get_exec_path():
+            continue
+        if not os.path.isdir(candidate):
+            try:
+                os.makedirs(candidate, exist_ok=True)
+                print('%screating %s%s' % (clr_grey, candidate, clr_none))
+            except PermissionError:
                 continue
-            if not os.path.isdir(candidate):
-                try:
-                    os.makedirs(candidate, exist_ok=True)
-                    print('%screating %s%s' % (clr_grey, candidate, clr_none))
-                except PermissionError:
-                    continue
-            if not os.access(candidate, os.W_OK):
-                continue
-            bin_dir = candidate
-            break
+        if not os.access(candidate, os.W_OK):
+            continue
+        bin_dir = candidate
+        break
 
     if bin_dir is False:
         using_zsh = os.path.exists(os.path.expanduser('~/.zshrc'))
         shell_configuration = "~/.zshrc" if using_zsh else "~/.bashrc"
         # If we fail, recommend one that doesn't require sudo (e.g. standard home path)
         bin_recommend = '~/.local/bin'
-        warning('Tried the following places: %s' % ', '.join(bin_candidates))
+        warning('Tried the following places: %s' % ', '.join(candidates))
         warning('Add "export PATH=$PATH%s%s" in %s and try again.' % (os.pathsep, bin_recommend, shell_configuration))
         error_exit('Could not find writable installation folder')
 
     return bin_dir
 
 
-def absent_bin(cmd_dest):
+def absent_bin(cmd_dest, contains=None, cmd_src=None):
     for candidate in bin_candidates:
         candidate = os.path.expanduser(candidate)
         dest = os.path.join(candidate, cmd_dest)
+
         try:
+            if contains is not None:
+                with open(dest) as f:
+                    # verify the contents to make sure we
+                    # preserve the real npm, e.g. in /usr/local/bin,
+                    # when fresh-npm is in $HOME
+                    if not contains in f.read():
+                        return
             os.remove(dest)
-            print('%sremoving %s from %s%s' % (clr_grey, cmd_dest, dest, clr_none))
+            print('%sremoving %s from %s%s' % (clr_grey, cmd_src or cmd_dest, dest, clr_none))
         except (FileNotFoundError, OSError) as e:
             # Ignore if already gone
             # Ignore if no permission to remove
@@ -177,4 +211,5 @@ debug = (len(sys.argv) == 2 and sys.argv[1] == '--debug')
 if debug:
     debug_checksums()
 else:
-    install_bin_all()
+    secure_npm = (len(sys.argv) == 2 and sys.argv[1] == '--secure-npm')
+    install_bin_all(secure_npm)
