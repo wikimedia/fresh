@@ -10,7 +10,9 @@ imageversion=0.6.2
 shortname=fresh-node10
 mountsrc="$PWD"
 mountdest="/"$(basename "$PWD")
+instance_tmp_name="fresh_$(basename "$PWD")_$RANDOM"
 welcometxt_suffix=
+envfile=
 docker_args=()
 
 # Parse options
@@ -89,11 +91,6 @@ fi
 if [ -n "$allow_env_mw" ] || [ -n "$allow_env_sauce" ]; then
 	envfile="$(mktemp)"
 	docker_args+=("--env-file" "$envfile")
-	# Teardown: unlink tmp env file, restore window title
-	trap "rm -f \"$envfile\"; echo -e '\033]2;\007'" 0 SIGTERM SIGINT
-else
-	# Teardown: restore window title
-	trap "echo -e '\033]2;\007'" 0 SIGTERM SIGINT
 fi
 if [ -n "$allow_env_mw" ]; then
 	# Backslash for grep bypasses user-defined aliases. – https://github.com/wikimedia/fresh/pull/7
@@ -132,6 +129,22 @@ elif [ "$(uname -s)" == "Linux" ]; then
 	fi
 fi
 
+function teardown {
+	# stop and remove temporary container
+	# this should be redundant since 'docker run --rm' is meant to take care of
+	# this already but at least with Terminal and Docker on macOS we know that
+	# when the user closes their terminal tab, the fresh-node script is closed
+	# properly (via trap), but the container keeps running for some reason.
+	$DOCKER_BIN rm -f "$instance_tmp_name" >/dev/null 2>&1 || true
+	# unlink tmp env file, if we used one.
+	if [ -n "$envfile" ]; then
+		rm -f "$envfile"
+	fi
+	# restore window title.
+	echo -e '\033]2;\007'
+}
+trap teardown 0 SIGTERM SIGINT
+
 # Setup: Change window title
 echo -e '\033]2;'"$shortname"'\007\c'
 
@@ -157,7 +170,7 @@ fi
 # which would be misinterpreted as docker-run argument.
 # See <https://stackoverflow.com/a/7577209/319266>
 
-$DOCKER_BIN run --rm -e 'HOME=/tmp' \
+$DOCKER_BIN run --rm --name "$instance_tmp_name" -e 'HOME=/tmp' \
 	--mount type=bind,source="$mountsrc",target="$mountdest"$bind_fastwrite \
 	$( if [ -n "$bind_git_ro" ]; then printf %s "--mount type=bind,source="$mountsrc"/.git,target="$mountdest"/.git,readonly"$bind_fastread; fi ) \
 	${docker_args[@]+"${docker_args[@]}"} \
