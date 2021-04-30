@@ -1,3 +1,16 @@
+21.04.1 / 2021-04-29
+==================
+
+### Changed
+
+* Bump Docker image to `node10-test-browser:0.6.3-s2`.
+  * Updated Chromium from 71 to 73.
+  * Updated Mozila Firefox from 68.11.0esr to 68.12.0esr.
+
+### Fixed
+
+* Containers now exit automatically when closing a terminal tab (Timo Tijhof)
+
 21.01.1 / 2021-01-27
 ==================
 

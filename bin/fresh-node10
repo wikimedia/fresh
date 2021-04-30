@@ -4,9 +4,9 @@
 #
 # This is free and unencumbered software released into the public domain.
 
-scriptversion='21.01.1 (2021-01-27)'
+scriptversion='21.04.1 (2021-04-29)'
 imagename=docker-registry.wikimedia.org/releng/node10-test-browser
-imageversion=0.6.2
+imageversion=0.6.3-s2
 shortname=fresh-node10
 mountsrc="$PWD"
 mountdest="/"$(basename "$PWD")
@@ -152,8 +152,8 @@ welcomecmd="echo \"$CLR_GREY# fresh: $CLR_BOLD$scriptversion$CLR_NONE$CLR_GREY
 # image: $imagename:$imageversion
 # software: Debian GNU/Linux 9 (stretch)
 #           Node.js v10.15.2 (npm 6.14.5)
-#           Chromium 71.0.3578.80
-#           Mozilla Firefox 68.11.0esr
+#           Chromium 73.0.3683.75
+#           Mozilla Firefox 68.12.0esr
 #           JSDuck 5.3.4 (Ruby 2.3.3)
 # mount: $mountdest      ➟ $mountsrc      (read-write)
 $welcometxt_suffix

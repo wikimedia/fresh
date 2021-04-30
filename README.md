@@ -10,9 +10,9 @@ _without_ putting your personal data at risk!
 Run the following from a terminal:
 
 ```sh
-bash -c 'curl -fsS https://gerrit.wikimedia.org/g/fresh/+/21.01.1/bin/fresh-node10?format=TEXT \
+bash -c 'curl -fsS https://gerrit.wikimedia.org/g/fresh/+/21.04.1/bin/fresh-node10?format=TEXT \
 | base64 --decode > /usr/local/bin/fresh-node \
-&& echo "1bd70d4235b05d411921f685e4a66784cf066278e8dd3207d356159aca986bb4  /usr/local/bin/fresh-node" | shasum -a 256 -c \
+&& echo "d38c34d542dc685669485bbe04a9d1a926a224a4ba27a01d59ae563558d8e987  /usr/local/bin/fresh-node" | shasum -a 256 -c \
 && chmod +x /usr/local/bin/fresh-node \
 && echo -e "\n\xf0\x9f\x8c\xb1\x20Fresh\x20is\x20ready\x21\n"||(echo -e "\xe2\x9d\x8c";false)'
 ```
@@ -44,9 +44,9 @@ Report bugs or feature requests to [Wikimedia Phabricator](https://phabricator.w
 
 Verify the integrity of your installation at any time, by running `shasum -a 256 /usr/local/bin/fresh-node` and compare the [SHA-256 checksum](https://en.wikipedia.org/wiki/SHA-256) against the below.
 
-| Checksum for Fresh 21.01.1 |
+| Checksum for Fresh 21.04.1 |
 |-------|
-| `1bd70d4235b05d411921f685e4a66784cf066278e8dd3207d356159aca986bb4` |
+| `d38c34d542dc685669485bbe04a9d1a926a224a4ba27a01d59ae563558d8e987` |
 
 To update or repair your copy, simply [re-install Fresh](#quick-start).
 
@@ -63,10 +63,10 @@ you@precious.local:myproject$ fresh-node
 # fresh: …
 # image: docker-registry.wikimedia.org/…/node10-test-browser:…
 # software: Debian Linux 9 Stretch
-#           Node.js 10 (npm 6)
+#           Node.js 10 (npm …)
 #           Chromium …
 #           Mozilla Firefox …
-#           JSDuck (Ruby 2.3)
+#           JSDuck … (Ruby …)
 # mount: /myproject ➟ /Users/you/myproject (read-write)
 
 🌱  Fresh!
