@@ -7,7 +7,7 @@ _without_ putting your personal data at risk!
 
 ## Quick start
 
-Run the following from a terminal:
+Run the install command from the terminal:
 
 ```sh
 bash -c 'curl -fsS https://gerrit.wikimedia.org/g/fresh/+/21.04.1/bin/fresh-node10?format=TEXT \
@@ -20,6 +20,27 @@ bash -c 'curl -fsS https://gerrit.wikimedia.org/g/fresh/+/21.04.1/bin/fresh-node
 This will save [fresh-node](/bin/fresh-node10) to the `/usr/local/bin/` directory, verify its integrity, and make it executable.
 
 Programs in this directory automatically become commands you can run from your terminal.
+
+### Troubleshooting
+
+* Permission denied for `/usr/local/bin/` ([T282879](https://phabricator.wikimedia.org/T282879))
+
+  ```
+  bash: /usr/local/bin/ Permission denied
+  curl: Failure writing output to destination
+  ```
+
+  This means your system isn't configured to allow users to install
+  shell programs, or your account doesn't have the necessary user
+  permissions.
+
+  Solution 1: Add `sudo` in front of the install command,
+  like `sudo bash -c … `. This is recommended on Linux.
+
+  Solution 2: Grant your user account permission to install shell
+  programs by running once `sudo chmod 775 /usr/local/bin/`. After
+  this, try the install command again. This is recommended on macOS.
+
 
 ### What's inside
 
