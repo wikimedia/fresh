@@ -10,41 +10,60 @@ import hashlib
 import os
 import stat
 import sys
-from urllib.request import Request, urlopen
-
-FRESH_VERSION='21.04.1'
-FRESH_NODE10_SHA256='d38c34d542dc685669485bbe04a9d1a926a224a4ba27a01d59ae563558d8e987'
+import urllib.request
 
 
-def install_bin(debug=False):
+def install_bin_all():
     """
     Download, verify, and install a shell command.
-
-
-    :param debug: In debug mode, this prints new checksums after a checksum error.
-                  This is for use during the release to help update this install script.
     """
 
+    # During development this can be a recent commit hash instead of a release tag,
+    # to allow full testing prior to release.
+    FRESH_VERSION='068a094973f712f67209450ee80ace5725f9253a'
+    FRESH_NODE10_SHA256='7c2f3d99e0a1469e1636ff4befededb20b0790d7b78118e1b770626eecf0e3b5'
+
+    install_bin(FRESH_VERSION, 'fresh-node10', FRESH_NODE10_SHA256, 'fresh-node')
+
+    print('%s  Fresh %s is now ready!' % (u'\U0001F331', FRESH_VERSION))
+
+
+def debug_checksums():
+    """
+    Make and print new checksums.
+    This is for use during release prep, to help update fresh-install.
+    """
+    make_checksum('fresh-node10')
+
+
+def error_exit(message):
+    print('fresh-install: %s' % (message), file=sys.stderr)
+    print(u'\u274C')
+    sys.exit(1)
+
+
+def install_bin(version_src, cmd_src, cmd_integrity, cmd_dest):
     # Download
-    url = 'https://gerrit.wikimedia.org/g/fresh/+/%s/bin/fresh-node10?format=TEXT' % (FRESH_VERSION)
-    req = Request(url, headers={
-        'User-Agent': 'Fresh/%s (Bot) https://gerrit.wikimedia.org/g/fresh' % (FRESH_VERSION)
+    url = 'https://gerrit.wikimedia.org/g/fresh/+/%s/bin/%s?format=TEXT' % (version_src, cmd_src)
+    req = urllib.request.Request(url, headers={
+        'User-Agent': 'Fresh/%s (Bot) https://gerrit.wikimedia.org/g/fresh' % (version_src)
     })
-    with urlopen(req) as resp:
-        data = resp.read().decode('utf-8')
+    try:
+        with urllib.request.urlopen(req) as resp:
+            data = resp.read().decode('utf-8')
+    except urllib.error.HTTPError as e:
+        error_exit('HTTP %s at %s' % (e.code, url))
+
     data = base64.b64decode(data)
 
     # Verify
     checksum = hashlib.sha256(data).hexdigest()
-    if checksum != FRESH_NODE10_SHA256:
-        print('fresh: checksum does not match', file=sys.stderr)
-        if debug:
-            print('New checksum for version %s: %s' % (FRESH_VERSION, checksum))
-        sys.exit(1)
+    if checksum != cmd_integrity:
+        error_exit('checksum of %s does not match' % (cmd_src))
 
     # Store file
     content = str(data, encoding='utf-8')
-    dest = '/usr/local/bin/fresh-node'
+    dest = '/usr/local/bin/%s' % (cmd_dest)
     with open(dest, 'w') as f:
         f.write(content)
 
@@ -53,5 +72,15 @@ def install_bin(debug=False):
     os.chmod(dest, current.st_mode | stat.S_IEXEC)
 
 
+def make_checksum(cmd_src):
+    with open('./bin/%s' % cmd_src, 'r') as f:
+        checksum = hashlib.sha256(f.read().encode('utf-8')).hexdigest()
+
+    print('New checksum for %s: %s' % (cmd_src, checksum))
+
+
 debug = (len(sys.argv) == 2 and sys.argv[1] == '--debug')
-install_bin(debug)
+if debug:
+    debug_checksums()
+else:
+    install_bin_all()

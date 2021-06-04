@@ -10,10 +10,14 @@ _without_ putting your personal data at risk!
 Run the install command from the terminal:
 
 ```sh
-/bin/bash -c "$(curl -fsS 'https://gerrit.wikimedia.org/g/fresh/+/HEAD/bin/fresh-install?format=TEXT' | base64 --decode)"
+bash -c 'curl -fsS https://gerrit.wikimedia.org/g/fresh/+/21.04.1/bin/fresh-node10?format=TEXT \
+| base64 --decode > /usr/local/bin/fresh-node \
+&& echo "d38c34d542dc685669485bbe04a9d1a926a224a4ba27a01d59ae563558d8e987  /usr/local/bin/fresh-node" | shasum -a 256 -c \
+&& chmod +x /usr/local/bin/fresh-node \
+&& echo -e "\n\xf0\x9f\x8c\xb1\x20Fresh\x20is\x20ready\x21\n"||(echo -e "\xe2\x9d\x8c";false)'
 ```
 
-This will run the [fresh-install](./bin/fresh-install) script, which saves [fresh-node](/bin/fresh-node10) to the `/usr/local/bin/` directory, verifies its integrity, and makes it executable.
+This save [fresh-node](/bin/fresh-node10) to the `/usr/local/bin/` directory, verify its integrity, and make it executable.
 
 Programs in this directory automatically become commands you can run from your terminal.
 
@@ -40,12 +44,12 @@ Programs in this directory automatically become commands you can run from your t
 
 ### What's inside
 
-* **Node.js** 10 with npm 6
+* **Node.js** with npm
 * **Firefox**
 * **Chromium**
 * `chromedriver`, `ffmpeg`, and `xvfb` (for browser tests)
 * JSDuck
-* Debian Linux 9 Stretch
+* Debian Linux
 
 ### Prerequisites
 
@@ -56,16 +60,6 @@ On Linux, [Podman](https://podman.io/) can also be used.
 ### Issue tracker
 
 Report bugs or feature requests to [Wikimedia Phabricator](https://phabricator.wikimedia.org/tag/fresh/).
-
-### Integrity
-
-Verify the integrity of your installation at any time, by running `shasum -a 256 /usr/local/bin/fresh-node` and compare the [SHA-256 checksum](https://en.wikipedia.org/wiki/SHA-256) against the below.
-
-| Checksum for Fresh 21.04.1 |
-|-------|
-| `d38c34d542dc685669485bbe04a9d1a926a224a4ba27a01d59ae563558d8e987` |
-
-To update or repair your copy, simply [re-install Fresh](#quick-start).
 
 ## Usage
 
