@@ -81,6 +81,20 @@ title "forward exit code"
 	assert "$code" "42"
 }
 
+# This verifies both that the documentation is up-to-date with the
+# the current image, and that the current image offers the currently
+# documented software and versions thereof.
+title "packages / advertised software versions"
+{
+	result_welcome=$(FRESH_INTERNAL_RUNCMD=exit ./bin/fresh-node)
+	# There are invisible control characters at the start and end of the output (window title setup),
+	# that we need to strip out for the "contains" assertion to work.
+	# This is currently done naturally by the output having a line break at the start and end,
+	# and grepping only for lines we are intersted in.
+	result_live=$(FRESH_INTERNAL_RUNCMD=_fresh_versions ./bin/fresh-node | grep --color=never '#')
+	assert_contains "$result_welcome" "$result_live"
+}
+
 title "environment / default CHROMIUM_FLAGS"
 {
 	result=$(FRESH_INTERNAL_RUNCMD='echo $CHROMIUM_FLAGS' ./bin/fresh-node)
@@ -231,7 +245,6 @@ title "mount / cannot write to .git subdirectory file"
 
 	popd
 }
-
 
 title "mount / cannot create a .git subdirectory file"
 {

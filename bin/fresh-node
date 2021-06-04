@@ -148,22 +148,41 @@ trap teardown 0 SIGTERM SIGINT
 # Setup: Change window title
 echo -e '\033]2;'"$shortname"'\007\c'
 
+# Optimisation: Make startup faster by not doing file reads or shell
+# commands to generate the welcome message. Instead, prior to a release:
+#
+# 1. Run `FRESH_INTERNAL_RUNCMD=_fresh_versions ./bin/fresh-node`
+# 2. Update the below $welcomecmd value accordingly.
+#
 welcomecmd="echo \"$CLR_GREY# fresh: $CLR_BOLD$scriptversion$CLR_NONE$CLR_GREY
 # image: $imagename:$imageversion
 # software: Debian GNU/Linux 9 (stretch)
 #           Node.js v10.15.2 (npm 6.14.5)
 #           Chromium 73.0.3683.75
 #           Mozilla Firefox 68.12.0esr
-#           JSDuck 5.3.4 (Ruby 2.3.3)
+#           JSDuck 5.3.4 (Ruby 2.3.3) ruby 2.3.3p222
 # mount: $mountdest      ➟ $mountsrc      (read-write)
 $welcometxt_suffix
 🌱  ${CLR_BOLD}${CLR_GREEN}Fresh!
 $CLR_NONE\""
 if [ -n "${FRESH_INTERNAL_RUNCMD:-}" ]; then
 	runcmd="$FRESH_INTERNAL_RUNCMD"
+	if [ "$runcmd" == "_fresh_versions" ]; then
+		FRESH_INTERNAL_NOWELCOME=1
+		runcmd=". /etc/os-release
+printf \"\n# image: $imagename:$imageversion
+# software: \$PRETTY_NAME
+#           Node.js \$(node --version) (npm \$(npm --version))
+#           Chromium \$(chromium --product-version)
+#           \$(firefox --version)
+#           \$(jsduck --version) \$(ruby --version | cut -d' ' -f1-2)\n\""
+	fi
 else
 	docker_args+=("--interactive" "--tty")
 	runcmd=bash
+fi
+if [ -z "${FRESH_INTERNAL_NOWELCOME:-}" ]; then
+	runcmd="$welcomecmd;$runcmd"
 fi
 
 # We expand the $docker_args in a special way to avoid passing "",
@@ -177,23 +196,4 @@ $DOCKER_BIN run --rm --name "$instance_tmp_name" -e 'HOME=/tmp' \
 	--entrypoint /bin/sh \
 	--security-opt label=disable \
 	"$imagename:$imageversion" \
-	-c "cd $mountdest/;$welcomecmd;$runcmd"
-
-# Optimisation: Make startup faster by not doing file reads or shell
-# commands to generate the welcome message. Instead, prior to a release:
-#
-# 1. Comment out the above 'docker run' command, and uncomment the one below,
-# 2. Run bin/fresh, and update the above $welcomecmd value accordingly.
-# 3. Undo step 1.
-
-# welcomecmd=". /etc/os-release
-# echo \"$CLR_YELLOW# image: $imagename:$imageversion
-# # software: \$PRETTY_NAME
-# #           Node.js \$(node --version) (npm \$(npm --version))
-# #           Chromium \$(chromium --product-version)
-# #           \$(firefox --version)
-# #           \$(jsduck --version) \$(ruby --version)
-# $CLR_NONE\""
-# $DOCKER_BIN run --rm --interactive --tty --entrypoint /bin/sh \
-#  "$imagename:$imageversion" \
-#  -c "$welcomecmd;false"
+	-c "cd $mountdest/;$runcmd"
