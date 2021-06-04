@@ -2,16 +2,16 @@
 
 ## Dockerfile
 
-The base image is generated from these files:
+The base image is generated from these Docker files:
 
-* [wikimedia/integration-config:node10/Dockerfile](https://github.com/wikimedia/integration-config/blob/de60ab21ed/dockerfiles/node10/Dockerfile.template#L1),
-* [wikimedia/integration-config:node10-test/Dockerfile](https://github.com/wikimedia/integration-config/blob/de60ab21ed/dockerfiles/node10-test/Dockerfile.template#L1), and
-* [wikimedia/integration-config:node10-test-browser/Dockerfile](https://github.com/wikimedia/integration-config/blob/de60ab21ed/dockerfiles/node10-test-browser/Dockerfile.template#L1).
+* [node/Dockerfile](https://github.com/wikimedia/integration-config/blob/de60ab21ed/dockerfiles/node10/Dockerfile.template#L1),
+* [node-test/Dockerfile](https://github.com/wikimedia/integration-config/blob/de60ab21ed/dockerfiles/node10-test/Dockerfile.template#L1), and
+* [node-test-browser/Dockerfile](https://github.com/wikimedia/integration-config/blob/de60ab21ed/dockerfiles/node10-test-browser/Dockerfile.template#L1).
 
 ## Bash script
 
 The bash script that quickly launches a temporary container can be found
-at [bin/fresh-node10](./bin/fresh-node10#L3).
+at [bin/fresh-node](./bin/fresh-node#L3).
 
 The script is documented inline, but I'll take apart the most
 import line here as well, the `docker run` command.

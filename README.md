@@ -17,7 +17,7 @@ bash -c 'curl -fsS https://gerrit.wikimedia.org/g/fresh/+/21.04.1/bin/fresh-node
 && echo -e "\n\xf0\x9f\x8c\xb1\x20Fresh\x20is\x20ready\x21\n"||(echo -e "\xe2\x9d\x8c";false)'
 ```
 
-This will save [fresh-node](/bin/fresh-node10) to the `/usr/local/bin/` directory, verify its integrity, and make it executable.
+This will save [fresh-node](/bin/fresh-node) to the `/usr/local/bin/` directory, verify its integrity, and make it executable.
 
 Programs in this directory automatically become commands you can run from your terminal.
 
@@ -82,9 +82,9 @@ you@precious.local:~$ cd myproject/
 you@precious.local:myproject$ fresh-node
 
 # fresh: …
-# image: docker-registry.wikimedia.org/…/node10-test-browser:…
-# software: Debian Linux 9 Stretch
-#           Node.js 10 (npm …)
+# image: docker-registry.wikimedia.org/…:…
+# software: Debian Linux …
+#           Node.js … (npm …)
 #           Chromium …
 #           Mozilla Firefox …
 #           JSDuck … (Ruby …)
@@ -104,10 +104,10 @@ The first time you start a Fresh environment, Docker will download the
 container image layers from `docker-registry.wikimedia.org`. This may take
 a few minutes.
 
-The fresh-node command uses the [`node10-test-browser` image](./Tutorial.md#start-of-content),
-which is the same exact image used by Jenkins CI at Wikimedia Foundation.
-This means you can trust that if it works in Fresh, it'll work in CI.
-And vice-versa, you can use Fresh to locally reproduce test failures.
+The fresh-node command uses the [`node-test-browser` image](./Tutorial.md#start-of-content)
+from Jenkins CI at Wikimedia Foundation. This means you can trust that if it
+works in Fresh, it'll work in CI. And vice-versa, you can use Fresh to locally
+reproduce test failures.
 
 ### Fast
 
