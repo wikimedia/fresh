@@ -5,9 +5,9 @@
 # This is free and unencumbered software released into the public domain.
 
 scriptversion='21.09.1'
-imagename=docker-registry.wikimedia.org/releng/node10-test-browser
-imageversion=0.6.3-s2
-shortname=fresh-node10
+imagename=docker-registry.wikimedia.org/releng/node12-test-browser
+imageversion=0.0.3
+shortname=fresh-node12
 mountsrc="$PWD"
 mountdest="/"$(basename "$PWD")
 instance_tmp_name="fresh_$(basename "$PWD")_$RANDOM"
@@ -157,11 +157,11 @@ echo -e '\033]2;'"$shortname"'\007\c'
 #
 welcomecmd="echo \"$CLR_GREY# fresh: $CLR_BOLD$scriptversion$CLR_NONE$CLR_GREY
 # image: $imagename:$imageversion
-# software: Debian GNU/Linux 9 (stretch)
-#           Node.js v10.15.2 (npm 6.14.5)
-#           Chromium 73.0.3683.75
-#           Mozilla Firefox 68.12.0esr
-#           JSDuck 5.3.4 (Ruby 2.3.3) ruby 2.3.3p222
+# software: Debian GNU/Linux 11 (bullseye)
+#           Node.js v12.21.0 (npm 7.5.2)
+#           Chromium 90.0.4430.212
+#           Mozilla Firefox 78.12.0esr
+#           JSDuck 5.3.4 (Ruby 2.7.4) ruby 2.7.4p191
 # mount: $mountdest      ➟ $mountsrc      (read-write)
 $welcometxt_suffix
 🌱  ${CLR_BOLD}${CLR_GREEN}Fresh!

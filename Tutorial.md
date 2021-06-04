@@ -4,9 +4,9 @@
 
 The base image is generated from these Docker files:
 
-* [node/Dockerfile](https://github.com/wikimedia/integration-config/blob/de60ab21ed/dockerfiles/node10/Dockerfile.template#L1),
-* [node-test/Dockerfile](https://github.com/wikimedia/integration-config/blob/de60ab21ed/dockerfiles/node10-test/Dockerfile.template#L1), and
-* [node-test-browser/Dockerfile](https://github.com/wikimedia/integration-config/blob/de60ab21ed/dockerfiles/node10-test-browser/Dockerfile.template#L1).
+* [node/Dockerfile](https://github.com/wikimedia/integration-config/blob/2a3f3ff2b41bbdfaf0044dbed23a2272353dcdee/dockerfiles/node12/Dockerfile.template#L1),
+* [node-test/Dockerfile](https://github.com/wikimedia/integration-config/blob/2a3f3ff2b41bbdfaf0044dbed23a2272353dcdee/dockerfiles/node12-test/Dockerfile.template#L1), and
+* [node-test-browser/Dockerfile](https://github.com/wikimedia/integration-config/blob/2a3f3ff2b41bbdfaf0044dbed23a2272353dcdee/dockerfiles/node12-test-browser/Dockerfile.template#L1).
 
 ## Bash script
 
