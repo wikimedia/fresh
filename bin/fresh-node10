@@ -7,7 +7,7 @@
 scriptversion='21.04.1 (2021-04-29)'
 imagename=docker-registry.wikimedia.org/releng/node10-test-browser
 imageversion=0.6.3-s2
-shortname=fresh-node
+shortname=fresh-node10
 mountsrc="$PWD"
 mountdest="/"$(basename "$PWD")
 instance_tmp_name="fresh_$(basename "$PWD")_$RANDOM"

@@ -13,7 +13,7 @@ Run the install command from the terminal:
 /bin/bash -c "$(curl -fsS 'https://gerrit.wikimedia.org/g/fresh/+/HEAD/bin/fresh-install?format=TEXT' | base64 --decode)"
 ```
 
-This will run the [fresh-install](./bin/fresh-install) script, which saves [fresh-node](/bin/fresh-node) to the `/usr/local/bin/` directory, verifies its integrity, and makes it executable.
+This will run the [fresh-install](./bin/fresh-install) script, which saves [fresh-node](/bin/fresh-node10) to the `/usr/local/bin/` directory, verifies its integrity, and makes it executable.
 
 Programs in this directory automatically become commands you can run from your terminal.
 

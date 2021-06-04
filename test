@@ -71,13 +71,13 @@ trap cleanup 0 ERR
 
 title "basic invocation"
 {
-	FRESH_INTERNAL_RUNCMD='exit' ./bin/fresh-node > /dev/null
+	FRESH_INTERNAL_RUNCMD='exit' ./bin/fresh-node10 > /dev/null
 }
 
 title "forward exit code"
 {
 	code=0
-	FRESH_INTERNAL_RUNCMD='exit 42' ./bin/fresh-node > /dev/null || code="$?"
+	FRESH_INTERNAL_RUNCMD='exit 42' ./bin/fresh-node10 > /dev/null || code="$?"
 	assert "$code" "42"
 }
 
@@ -86,18 +86,18 @@ title "forward exit code"
 # documented software and versions thereof.
 title "packages / advertised software versions"
 {
-	result_welcome=$(FRESH_INTERNAL_RUNCMD=exit ./bin/fresh-node)
+	result_welcome=$(FRESH_INTERNAL_RUNCMD=exit ./bin/fresh-node10)
 	# There are invisible control characters at the start and end of the output (window title setup),
 	# that we need to strip out for the "contains" assertion to work.
 	# This is currently done naturally by the output having a line break at the start and end,
 	# and grepping only for lines we are intersted in.
-	result_live=$(FRESH_INTERNAL_RUNCMD=_fresh_versions ./bin/fresh-node | grep --color=never '#')
+	result_live=$(FRESH_INTERNAL_RUNCMD=_fresh_versions ./bin/fresh-node10 | grep --color=never '#')
 	assert_contains "$result_welcome" "$result_live"
 }
 
 title "environment / default CHROMIUM_FLAGS"
 {
-	result=$(FRESH_INTERNAL_RUNCMD='echo $CHROMIUM_FLAGS' ./bin/fresh-node)
+	result=$(FRESH_INTERNAL_RUNCMD='echo $CHROMIUM_FLAGS' ./bin/fresh-node10)
 	assert_lastline "$result" "--no-sandbox"
 }
 
@@ -106,7 +106,7 @@ title "environment / warn if no MW_ vars with -env-mw"
 	mkdir -p fixtures/10-env-mw
 	pushd fixtures/10-env-mw
 
-	result=$(FRESH_INTERNAL_RUNCMD='exit' $BASE/bin/fresh-node -env-mw)
+	result=$(FRESH_INTERNAL_RUNCMD='exit' $BASE/bin/fresh-node10 -env-mw)
 	assert_contains "$result" "env: MW_*, MEDIAWIKI_* (none found)"
 
 	popd
@@ -115,28 +115,28 @@ title "environment / warn if no MW_ vars with -env-mw"
 title "environment / protect FOO by default"
 {
 	export FOO="inherited"
-	result=$(FRESH_INTERNAL_RUNCMD='echo $FOO' ./bin/fresh-node)
+	result=$(FRESH_INTERNAL_RUNCMD='echo $FOO' ./bin/fresh-node10)
 	assert_lastline "$result" ""
 }
 
 title "environment / protect MW_FOO by default"
 {
 	export MW_FOO="inherited"
-	result=$(FRESH_INTERNAL_RUNCMD='echo $MW_FOO' ./bin/fresh-node)
+	result=$(FRESH_INTERNAL_RUNCMD='echo $MW_FOO' ./bin/fresh-node10)
 	assert_lastline "$result" ""
 }
 
 title "environment / inherit MW_FOO with -env"
 {
 	export MW_FOO="inherited"
-	result=$(FRESH_INTERNAL_RUNCMD='echo $MW_FOO' ./bin/fresh-node -env)
+	result=$(FRESH_INTERNAL_RUNCMD='echo $MW_FOO' ./bin/fresh-node10 -env)
 	assert_lastline "$result" "inherited"
 }
 
 title "environment / inherit MEDIAWIKI_FOO with -env"
 {
 	export MEDIAWIKI_FOO="inherited"
-	result=$(FRESH_INTERNAL_RUNCMD='echo $MEDIAWIKI_FOO' ./bin/fresh-node -env)
+	result=$(FRESH_INTERNAL_RUNCMD='echo $MEDIAWIKI_FOO' ./bin/fresh-node10 -env)
 	assert_lastline "$result" "inherited"
 }
 
@@ -146,7 +146,7 @@ title "environment / inherit MEDIAWIKI_BAR .env file with -env"
 	pushd fixtures/10-env
 	echo "MEDIAWIKI_BAR=inherited" > .env
 
-	result=$(FRESH_INTERNAL_RUNCMD='echo $MEDIAWIKI_BAR' $BASE/bin/fresh-node -env)
+	result=$(FRESH_INTERNAL_RUNCMD='echo $MEDIAWIKI_BAR' $BASE/bin/fresh-node10 -env)
 	assert_lastline "$result" "inherited"
 
 	popd
@@ -159,7 +159,7 @@ title "environment / inherit MEDIAWIKI_BAZ .env file with -env, overriding expor
 
 	export MEDIAWIKI_BAZ="inherited"
 	echo "MEDIAWIKI_BAZ=overridden" > .env
-	result=$(FRESH_INTERNAL_RUNCMD='echo $MEDIAWIKI_BAZ' $BASE/bin/fresh-node -env)
+	result=$(FRESH_INTERNAL_RUNCMD='echo $MEDIAWIKI_BAZ' $BASE/bin/fresh-node10 -env)
 	assert_lastline "$result" "overridden"
 
 	popd
@@ -171,7 +171,7 @@ title "environment / warn if no SAUCE_ vars with -env-sauce"
 	pushd fixtures/30-env
 
 	export MEDIAWIKI_FOO="FOO"
-	result=$(FRESH_INTERNAL_RUNCMD='exit' $BASE/bin/fresh-node -env-sauce)
+	result=$(FRESH_INTERNAL_RUNCMD='exit' $BASE/bin/fresh-node10 -env-sauce)
 	assert_contains "$result" "env: SAUCE_* (none found)"
 
 	popd
@@ -180,14 +180,14 @@ title "environment / warn if no SAUCE_ vars with -env-sauce"
 title "environment / protect FOO even with -env"
 {
 	export FOO="inherited"
-	result=$(FRESH_INTERNAL_RUNCMD='echo $FOO' ./bin/fresh-node -env)
+	result=$(FRESH_INTERNAL_RUNCMD='echo $FOO' ./bin/fresh-node10 -env)
 	assert_lastline "$result" ""
 }
 
 title "user / default (Linux)"
 λ() {
 	host_uid=$(id -u)
-	result=$(FRESH_INTERNAL_RUNCMD='/usr/bin/id -u' ./bin/fresh-node)
+	result=$(FRESH_INTERNAL_RUNCMD='/usr/bin/id -u' ./bin/fresh-node10)
 	assert_lastline "$result" "$host_uid"
 }
 if_linux λ
@@ -195,14 +195,14 @@ if_linux λ
 
 title "user / default (macOS)"
 λ() {
-	result=$(FRESH_INTERNAL_RUNCMD='/usr/bin/id -un' ./bin/fresh-node)
+	result=$(FRESH_INTERNAL_RUNCMD='/usr/bin/id -un' ./bin/fresh-node10)
 	assert_lastline "$result" "nobody"
 }
 if_mac λ
 
 title "user / with -root"
 {
-	result=$(FRESH_INTERNAL_RUNCMD='/usr/bin/id -un' ./bin/fresh-node -root)
+	result=$(FRESH_INTERNAL_RUNCMD='/usr/bin/id -un' ./bin/fresh-node10 -root)
 	assert_lastline "$result" "root"
 }
 
@@ -212,7 +212,7 @@ title "mount / expose current directory as readable"
 	pushd fixtures/some/dir/10-read
 	echo "exposed content" > file.txt
 
-	result=$(FRESH_INTERNAL_RUNCMD='cat /10-read/file.txt' $BASE/bin/fresh-node) || true
+	result=$(FRESH_INTERNAL_RUNCMD='cat /10-read/file.txt' $BASE/bin/fresh-node10) || true
 	assert_lastline "$result" "exposed content"
 
 	popd
@@ -224,7 +224,7 @@ title "mount / expose current directory as writable"
 	pushd fixtures/some/dir/20-write
 	echo "original content" > file.txt
 
-	FRESH_INTERNAL_RUNCMD='echo changed content > /20-write/file.txt' $BASE/bin/fresh-node > /dev/null || true
+	FRESH_INTERNAL_RUNCMD='echo changed content > /20-write/file.txt' $BASE/bin/fresh-node10 > /dev/null || true
 	result=$(cat file.txt)
 	assert_lastline "$result" "changed content"
 
@@ -238,7 +238,7 @@ title "mount / cannot write to .git subdirectory file"
 	echo "original content" > .git/file.txt
 	code=0
 
-	FRESH_INTERNAL_RUNCMD='echo changed content > /30-git/.git/file.txt' $BASE/bin/fresh-node > /dev/null || code="$?"
+	FRESH_INTERNAL_RUNCMD='echo changed content > /30-git/.git/file.txt' $BASE/bin/fresh-node10 > /dev/null || code="$?"
 	result=$(cat .git/file.txt)
 	assert_lastline "$result" "original content"
 	assert "$code" "2"
@@ -252,7 +252,7 @@ title "mount / cannot create a .git subdirectory file"
 	pushd fixtures/some/dir/40-git
 	code=0
 
-	FRESH_INTERNAL_RUNCMD='touch /40-git/.git/file.txt' $BASE/bin/fresh-node > /dev/null || code="$?"
+	FRESH_INTERNAL_RUNCMD='touch /40-git/.git/file.txt' $BASE/bin/fresh-node10 > /dev/null || code="$?"
 	result=$(test -f .git/file.txt && echo created file || echo not created)
 	assert "$result" "not created"
 	assert "$code" "1"
