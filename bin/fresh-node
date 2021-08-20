@@ -54,7 +54,7 @@ for arg in "$@"; do
 		*)
 		echo "unknown option: $arg" 1>&2
 		echo "usage: $shortname [-env-mw] [-env-sauce] [-net] [-root] [-podman]" 1>&2
-		echo "to run a specific command: FRESH_INTERNAL_RUNCMD="...cmd..." $shortname" 1>&2
+		echo "to run a specific command: FRESH_INTERNAL_RUNCMD=\"...cmd...\" $shortname" 1>&2
 		exit 1
 		;;
 	esac
