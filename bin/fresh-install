@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+"""
+fresh-install <https://gerrit.wikimedia.org/g/fresh>
+
+This is free and unencumbered software released into the public domain.
+"""
+
+import base64
+import hashlib
+import os
+import stat
+import sys
+from urllib.request import Request, urlopen
+
+FRESH_VERSION='21.04.1'
+FRESH_NODE10_SHA256='d38c34d542dc685669485bbe04a9d1a926a224a4ba27a01d59ae563558d8e987'
+
+
+def install_bin(debug=False):
+    """
+    Download, verify, and install a shell command.
+
+
+    :param debug: In debug mode, this prints new checksums after a checksum error.
+                  This is for use during the release to help update this install script.
+    """
+
+    # Download
+    url = 'https://gerrit.wikimedia.org/g/fresh/+/%s/bin/fresh-node10?format=TEXT' % (FRESH_VERSION)
+    req = Request(url, headers={
+        'User-Agent': 'Fresh/%s (Bot) https://gerrit.wikimedia.org/g/fresh' % (FRESH_VERSION)
+    })
+    with urlopen(req) as resp:
+        data = resp.read().decode('utf-8')
+    data = base64.b64decode(data)
+
+    # Verify
+    checksum = hashlib.sha256(data).hexdigest()
+    if checksum != FRESH_NODE10_SHA256:
+        print('fresh: checksum does not match', file=sys.stderr)
+        if debug:
+            print('New checksum for version %s: %s' % (FRESH_VERSION, checksum))
+        sys.exit(1)
+
+    # Store file
+    content = str(data, encoding='utf-8')
+    dest = '/usr/local/bin/fresh-node'
+    with open(dest, 'w') as f:
+        f.write(content)
+
+    # Make file executable
+    current = os.stat(dest)
+    os.chmod(dest, current.st_mode | stat.S_IEXEC)
+
+
+debug = (len(sys.argv) == 2 and sys.argv[1] == '--debug')
+install_bin(debug)
