@@ -10,14 +10,10 @@ _without_ putting your personal data at risk!
 Run the install command from the terminal:
 
 ```sh
-bash -c 'curl -fsS https://gerrit.wikimedia.org/g/fresh/+/21.04.1/bin/fresh-node10?format=TEXT \
-| base64 --decode > /usr/local/bin/fresh-node \
-&& echo "d38c34d542dc685669485bbe04a9d1a926a224a4ba27a01d59ae563558d8e987  /usr/local/bin/fresh-node" | shasum -a 256 -c \
-&& chmod +x /usr/local/bin/fresh-node \
-&& echo -e "\n\xf0\x9f\x8c\xb1\x20Fresh\x20is\x20ready\x21\n"||(echo -e "\xe2\x9d\x8c";false)'
+curl -fsS 'https://gerrit.wikimedia.org/g/fresh/+/21.09.1/bin/fresh-install?format=TEXT' | base64 --decode | python3
 ```
 
-This save [fresh-node](/bin/fresh-node10) to the `/usr/local/bin/` directory, verify its integrity, and make it executable.
+This will save [fresh-node](/bin/fresh-node12) to the `/usr/local/bin/` directory, verify its integrity, and make it executable.
 
 Programs in this directory automatically become commands you can run from your terminal.
 
