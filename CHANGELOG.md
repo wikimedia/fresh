@@ -1,3 +1,15 @@
+21.09.1
+==================
+
+### Added
+
+* Add command `fresh-node12` which comes with:
+  * Node.js 12 and npm 7.
+  * Chromium 90, Mozilla Firefox 78, Debian Linux 11 Bullseye.
+* Add command `fresh-node14` which comes with:
+  * Node.js 14 and npm 7.
+  * Chromium 90, Mozilla Firefox 78, Debian Linux 11 Bullseye.
+
 21.04.1 / 2021-04-29
 ==================
 

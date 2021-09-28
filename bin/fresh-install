@@ -20,10 +20,14 @@ def install_bin_all():
 
     # During development this can be a recent commit hash instead of a release tag,
     # to allow full testing prior to release.
-    FRESH_VERSION='068a094973f712f67209450ee80ace5725f9253a'
-    FRESH_NODE10_SHA256='7c2f3d99e0a1469e1636ff4befededb20b0790d7b78118e1b770626eecf0e3b5'
+    FRESH_VERSION='92b270f668a2fc4a39a135788d1f9583a543b820'
+    FRESH_NODE10_SHA256='ab62b4b0081b325fa108de4fa47659cf2fce7501c5d5f2890eff56b7241c8ffc'
+    FRESH_NODE12_SHA256='8652aad22feb5e623bf2d5a9a52552c19699b996ba2d7c593d731d63216d5172'
+    FRESH_NODE14_SHA256='ba29a5666ddf84e52de3bd81082afd14efd3b153b53049ddc33b1bb5f74bf912'
 
-    install_bin(FRESH_VERSION, 'fresh-node10', FRESH_NODE10_SHA256, 'fresh-node')
+    install_bin(FRESH_VERSION, 'fresh-node10', FRESH_NODE10_SHA256, 'fresh-node10')
+    install_bin(FRESH_VERSION, 'fresh-node12', FRESH_NODE12_SHA256, 'fresh-node')
+    install_bin(FRESH_VERSION, 'fresh-node14', FRESH_NODE14_SHA256, 'fresh-node14')
 
     print('%s  Fresh %s is now ready!' % (u'\U0001F331', FRESH_VERSION))
 
@@ -34,6 +38,8 @@ def debug_checksums():
     This is for use during release prep, to help update fresh-install.
     """
     make_checksum('fresh-node10')
+    make_checksum('fresh-node12')
+    make_checksum('fresh-node14')
 
 
 def error_exit(message):
