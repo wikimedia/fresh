@@ -13,9 +13,9 @@ Run the install command from the terminal:
 curl -fsS 'https://gerrit.wikimedia.org/g/fresh/+/21.09.1/bin/fresh-install?format=TEXT' | base64 --decode | python3
 ```
 
-This will save [fresh-node](/bin/fresh-node12) to the `/usr/local/bin/` directory, verify its integrity, and make it executable.
+This will download [fresh-node](/bin/fresh-node12), verify its integrity, and save it to `/usr/local/bin/`. Programs in this directory automatically become commands you can run from your terminal.
 
-Programs in this directory automatically become commands you can run from your terminal.
+Review [fresh-install](/bin/fresh-install) source.
 
 ### Troubleshooting
 
