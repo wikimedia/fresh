@@ -23,19 +23,14 @@ Review [fresh-install](/bin/fresh-install) source.
 
   ```
   bash: /usr/local/bin/ Permission denied
-  curl: Failure writing output to destination
   ```
 
   This means your system isn't configured to allow users to install
   shell programs, or your account doesn't have the necessary user
-  permissions.
+  permissions. (This is expected on Linux.)
 
-  Solution 1: Add `sudo` in front of the install command,
-  like `sudo bash -c … `. This is recommended on Linux.
-
-  Solution 2: Grant your user account permission to install shell
-  programs by running once `sudo chmod 775 /usr/local/bin/`. After
-  this, try the install command again. This is recommended on macOS.
+  Solution: Replace `python3` with `sudo python3` at the end of the install
+  command.
 
 
 ### What's inside
