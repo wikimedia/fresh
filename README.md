@@ -10,7 +10,7 @@ _without_ putting your personal data at risk!
 Run the install command from the terminal:
 
 ```sh
-curl -fsS 'https://gerrit.wikimedia.org/g/fresh/+/21.09.1/bin/fresh-install?format=TEXT' | base64 --decode | python3
+curl -fsS 'https://gerrit.wikimedia.org/g/fresh/+/22.01.1/bin/fresh-install?format=TEXT' | base64 --decode | python3
 ```
 
 This will download [fresh-node](/bin/fresh-node12), verify its integrity, and save it to `/usr/local/bin/`. Programs in this directory automatically become commands you can run from your terminal.
