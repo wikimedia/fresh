@@ -1,3 +1,22 @@
+22.01.1
+==================
+
+### Added
+
+* fresh-node12: Add `npx` command.
+* fresh-node14: Add `npx` command.
+
+### Changed
+
+* fresh-node12: Bump image to `releng/node12-test-browser:0.0.3-s3`.
+  * Update npm from 7.5.2 to 7.21.0.
+  * Update Chromium from 90 to 97.
+  * Update Mozila Firefox from 78esr to 91esr.
+* fresh-node14: Bump image to `releng/node14-test-browser:0.0.2-s4`.
+  * Update npm from 7.5.2 to 7.21.0.
+  * Update Chromium from 90 to 97.
+  * Update Mozila Firefox from 78esr to 91esr.
+
 21.09.1
 ==================
 

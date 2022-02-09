@@ -4,7 +4,7 @@
 #
 # This is free and unencumbered software released into the public domain.
 
-scriptversion='21.09.1'
+scriptversion='22.01.1'
 imagename=docker-registry.wikimedia.org/releng/node14-test-browser
 imageversion=0.0.2-s4
 shortname=fresh-node14
@@ -158,9 +158,9 @@ echo -e '\033]2;'"$shortname"'\007\c'
 welcomecmd="echo \"$CLR_GREY# fresh: $CLR_BOLD$scriptversion$CLR_NONE$CLR_GREY
 # image: $imagename:$imageversion
 # software: Debian GNU/Linux 11 (bullseye)
-#           Node.js v14.17.5 (npm 7.5.2)
-#           Chromium 90.0.4430.212
-#           Mozilla Firefox 78.12.0esr
+#           Node.js v14.17.5 (npm 7.21.0)
+#           Chromium 97.0.4692.99
+#           Mozilla Firefox 91.5.0esr
 #           JSDuck 5.3.4 (Ruby 2.7.4) ruby 2.7.4p191
 # mount: $mountdest      ➟ $mountsrc      (read-write)
 $welcometxt_suffix
