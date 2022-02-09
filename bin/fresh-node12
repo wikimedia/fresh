@@ -6,7 +6,7 @@
 
 scriptversion='21.09.1'
 imagename=docker-registry.wikimedia.org/releng/node12-test-browser
-imageversion=0.0.3
+imageversion=0.0.3-s3
 shortname=fresh-node12
 mountsrc="$PWD"
 mountdest="/"$(basename "$PWD")

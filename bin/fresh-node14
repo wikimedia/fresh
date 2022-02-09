@@ -6,7 +6,7 @@
 
 scriptversion='21.09.1'
 imagename=docker-registry.wikimedia.org/releng/node14-test-browser
-imageversion=0.0.2
+imageversion=0.0.2-s4
 shortname=fresh-node14
 mountsrc="$PWD"
 mountdest="/"$(basename "$PWD")
