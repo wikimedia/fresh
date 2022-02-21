@@ -29,13 +29,13 @@ def install_bin_all():
     # During development this can be a recent commit hash instead of a release tag,
     # to allow full testing prior to release.
     FRESH_VERSION='22.01.1'
-    FRESH_NODE10_SHA256='107649be7e6307214460a1256f9ff8f819c0f5278146927928e794a64367cc48'
     FRESH_NODE12_SHA256='8c9a0c0cbeb23390d5a39da47c57cd67da5bdd7d50a049836108940b76983691'
     FRESH_NODE14_SHA256='dccced40d1028026a2f352197fd9427f495acd132c1bd1ed472e7fa1adb762ba'
 
-    install_bin(FRESH_VERSION, 'fresh-node10', FRESH_NODE10_SHA256, 'fresh-node10')
     install_bin(FRESH_VERSION, 'fresh-node12', FRESH_NODE12_SHA256, 'fresh-node')
     install_bin(FRESH_VERSION, 'fresh-node14', FRESH_NODE14_SHA256, 'fresh-node14')
+
+    absent_bin('fresh-node10')
 
     print('')
     print('%s  Fresh %s is now ready!' % (u'\U0001F331', FRESH_VERSION))
@@ -46,7 +46,6 @@ def debug_checksums():
     Make and print new checksums.
     This is for use during release prep, to help update fresh-install.
     """
-    make_checksum('fresh-node10')
     make_checksum('fresh-node12')
     make_checksum('fresh-node14')
 
@@ -88,6 +87,17 @@ def install_bin(version_src, cmd_src, cmd_integrity, cmd_dest):
     # Make file executable
     current = os.stat(dest)
     os.chmod(dest, current.st_mode | stat.S_IEXEC)
+
+
+def absent_bin(cmd_dest):
+    dest = '/usr/local/bin/%s' % (cmd_dest)
+    try:
+        os.remove(dest)
+        print('%suninstalled %s%s' % (clr_grey, cmd_dest, clr_none))
+    except (FileNotFoundError, OSError) as e:
+        # Ignore if already gone
+        # Ignore if no permission to remove
+        pass
 
 
 def make_checksum(cmd_src):
