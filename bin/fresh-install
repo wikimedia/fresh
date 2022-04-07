@@ -20,6 +20,21 @@ clr_yellow = "\x1b[%sm" % (33)
 clr_grey = "\x1b[%sm" % (37)
 clr_none = "\x1b[%sm" % (39)
 
+bin_candidates = [
+    # Preferred location if writable by user (common on macOS)
+    '/usr/local/bin',
+    # Preferred standard home path
+    # https://specifications.freedesktop.org/basedir-spec/
+    # https://www.freedesktop.org/software/systemd/man/file-hierarchy.html
+    '~/.local/bin',
+    # Older convention that is often already in-use, whether by default
+    # as on Ubuntu, or from the developer having set PATH this way.
+    # https://bugs.launchpad.net/ubuntu/+source/bash/+bug/1588562
+    # https://unix.stackexchange.com/a/392710/37512
+    '~/bin',
+]
+bin_dir = None
+
 
 def install_bin_all():
     """
@@ -32,6 +47,9 @@ def install_bin_all():
     FRESH_NODE12_SHA256='8c9a0c0cbeb23390d5a39da47c57cd67da5bdd7d50a049836108940b76983691'
     FRESH_NODE14_SHA256='dccced40d1028026a2f352197fd9427f495acd132c1bd1ed472e7fa1adb762ba'
 
+    # Run get_bin_path first to improve message order
+    # e.g. not "creating dir" between two "installing" messages
+    get_bin_path()
     install_bin(FRESH_VERSION, 'fresh-node12', FRESH_NODE12_SHA256, 'fresh-node')
     install_bin(FRESH_VERSION, 'fresh-node14', FRESH_NODE14_SHA256, 'fresh-node14')
 
@@ -50,6 +68,10 @@ def debug_checksums():
     make_checksum('fresh-node14')
 
 
+def warning(message):
+    print('%s%s%s' % (clr_yellow, message, clr_none))
+
+
 def error_exit(message):
     print('fresh-install: %s' % (message), file=sys.stderr)
     print(u'\u274C')
@@ -57,8 +79,8 @@ def error_exit(message):
 
 
 def install_bin(version_src, cmd_src, cmd_integrity, cmd_dest):
-    comment = '' if cmd_src == cmd_dest else ' (%s)' % (cmd_src)
-    print('%sinstalling %s%s%s' % (clr_grey, cmd_dest, comment, clr_none))
+    dest = os.path.join(get_bin_path(), cmd_dest)
+    print('%sinstalling %s to %s%s' % (clr_grey, cmd_src, dest, clr_none))
 
     # Download
     url = 'https://gerrit.wikimedia.org/g/fresh/+/%s/bin/%s?format=TEXT' % (version_src, cmd_src)
@@ -80,7 +102,6 @@ def install_bin(version_src, cmd_src, cmd_integrity, cmd_dest):
 
     # Store file
     content = str(data, encoding='utf-8')
-    dest = '/usr/local/bin/%s' % (cmd_dest)
     with open(dest, 'w') as f:
         f.write(content)
 
@@ -89,15 +110,47 @@ def install_bin(version_src, cmd_src, cmd_integrity, cmd_dest):
     os.chmod(dest, current.st_mode | stat.S_IEXEC)
 
 
+def get_bin_path():
+    global bin_dir
+
+    if bin_dir is None:
+        bin_dir = False
+        for candidate in bin_candidates:
+            candidate = os.path.expanduser(candidate)
+            if not candidate in os.get_exec_path():
+                continue
+            if not os.path.isdir(candidate):
+                try:
+                    os.makedirs(candidate, exist_ok=True)
+                    print('%screating %s%s' % (clr_grey, candidate, clr_none))
+                except PermissionError:
+                    continue
+            if not os.access(candidate, os.W_OK):
+                continue
+            bin_dir = candidate
+            break
+
+    if bin_dir is False:
+        # If we fail, recommend one that doesn't require sudo (e.g. standard home path)
+        bin_recommend = '~/.local/bin'
+        warning('Tried the following places: %s' % ', '.join(bin_candidates))
+        warning('Set "PATH=$PATH%s%s" in ~/.bashrc and try again.' % (os.pathsep, bin_recommend))
+        error_exit('Could not find writable installation folder')
+
+    return bin_dir
+
+
 def absent_bin(cmd_dest):
-    dest = '/usr/local/bin/%s' % (cmd_dest)
-    try:
-        os.remove(dest)
-        print('%suninstalled %s%s' % (clr_grey, cmd_dest, clr_none))
-    except (FileNotFoundError, OSError) as e:
-        # Ignore if already gone
-        # Ignore if no permission to remove
-        pass
+    for candidate in bin_candidates:
+        candidate = os.path.expanduser(candidate)
+        dest = os.path.join(candidate, cmd_dest)
+        try:
+            os.remove(dest)
+            print('%sremoving %s from %s%s' % (clr_grey, cmd_dest, dest, clr_none))
+        except (FileNotFoundError, OSError) as e:
+            # Ignore if already gone
+            # Ignore if no permission to remove
+            pass
 
 
 def make_checksum(cmd_src):
@@ -109,6 +162,7 @@ def make_checksum(cmd_src):
 
 debug = (len(sys.argv) == 2 and sys.argv[1] == '--debug')
 if debug:
-    debug_checksums()
+    print(get_bin_path())
+    # debug_checksums()
 else:
     install_bin_all()

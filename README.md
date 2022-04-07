@@ -13,25 +13,9 @@ Run the install command from the terminal:
 curl -fsS 'https://gerrit.wikimedia.org/g/fresh/+/22.01.1/bin/fresh-install?format=TEXT' | base64 --decode | python3
 ```
 
-This will download [fresh-node](/bin/fresh-node12), verify its integrity, and save it to `/usr/local/bin/`. Programs in this directory automatically become commands you can run from your terminal.
+This will download [fresh-node](/bin/fresh-node12), verify its integrity, and save it to `/usr/local/bin/` or  `$HOME/.local/bin`. Programs in these directories automatically become available as commands on your terminal.
 
 Review [fresh-install](/bin/fresh-install) source.
-
-### Troubleshooting
-
-* Permission denied for `/usr/local/bin/` ([T282879](https://phabricator.wikimedia.org/T282879))
-
-  ```
-  bash: /usr/local/bin/ Permission denied
-  ```
-
-  This means your system isn't configured to allow users to install
-  shell programs, or your account doesn't have the necessary user
-  permissions. (This is expected on Linux.)
-
-  Solution: Replace `python3` with `sudo python3` at the end of the install
-  command.
-
 
 ### What's inside
 
