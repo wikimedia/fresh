@@ -44,15 +44,19 @@ if_linux() {
 	test -n "$ISLINUX" && $1 || echo "      [skip: linux-only]"
 }
 
-assert() {
+assert_equals() {
 	actual="$1"
 	expected="$2"
-	printf "      \"${actual}\" == \"${expected}\"\n"
-	test "$actual" = "$expected"
+	if [[ "$actual" == "$expected" ]]; then
+		printf "      equals \"$expected\"\n"
+	else
+		printf "      \"${actual}\" == \"${expected}\"\n"
+		false
+	fi
 }
 
 assert_lastline() {
-	assert "$(echo "$1" | tail -n2 | trim)" "$2"
+	assert_equals "$(echo "$1" | tail -n2 | trim)" "$2"
 }
 
 assert_contains() {
@@ -63,11 +67,79 @@ assert_contains() {
 	fi
 }
 
+assert_matches() {
+	printf "      contains \"$2\" (regex)\n"
+	if [[ ! "$1" =~ $2 ]]; then
+		printf "\n$1"
+		false
+	fi
+}
+
+assert_msg() {
+	printf "      $1\n"
+}
+
 cleanup() {
 	rm -rf ./fixtures
 }
 cleanup
 trap cleanup 0 ERR
+
+title "install / install to ~/.local/bin"
+{
+	mkdir -p fixtures/10-install/myhome
+	pushd fixtures/10-install
+	myhome="$PWD/myhome"
+	mypath="/bin:/usr/bin:$myhome/.local/bin"
+
+	result=$(FRESH_INTERNAL_TEST=1 PATH="$mypath" HOME="$myhome" $BASE/bin/fresh-install)
+	assert_matches "$result" "creating .*/myhome/.local/bin"
+	assert_contains "$result" "installing fresh-node"
+	assert_matches "$result" "Fresh .+ is now ready!"
+
+	result=$(PATH="/bin:/usr/bin:$myhome/.local/bin" fresh-node)
+	assert_lastline "$result" "Fake fresh-node"
+
+	popd
+}
+
+title "install / install to ~/bin"
+{
+	mkdir -p fixtures/20-install/myhome
+	pushd fixtures/20-install
+	myhome="$PWD/myhome"
+	mypath="/bin:/usr/bin:$myhome/bin"
+
+	result=$(FRESH_INTERNAL_TEST=1 PATH="$mypath" HOME="$myhome" $BASE/bin/fresh-install)
+	assert_matches "$result" "creating .*/myhome/bin"
+	assert_contains "$result" "installing fresh-node"
+	assert_matches "$result" "Fresh .+ is now ready!"
+
+	result=$(PATH="/bin:/usr/bin:$myhome/bin" fresh-node)
+	assert_lastline "$result" "Fake fresh-node"
+
+	popd
+}
+
+title "install / cannot find a place"
+{
+	mkdir -p fixtures/30-install/myhome
+	pushd fixtures/30-install
+	myhome="$PWD/myhome"
+	mypath="/bin:/usr/bin"
+	code=0
+
+	result=$(FRESH_INTERNAL_TEST=1 PATH="$mypath" HOME="$myhome" $BASE/bin/fresh-install 2>&1) || code="$?"
+	assert_contains "$result" "Tried the following places: /usr/local/bin, ~/"
+	assert_contains "$result" "fresh-install: Could not find writable installation folder"
+	assert_equals "$code" "1"
+
+	# must not create any directory or files unless in PATH
+	assert_msg "not create ~/bin/" && test ! -e "$myhome/bin"
+	assert_msg "not create ~/.local/" && test ! -e "$myhome/.local"
+
+	popd
+}
 
 title "basic invocation"
 {
@@ -78,7 +150,7 @@ title "forward exit code"
 {
 	code=0
 	FRESH_INTERNAL_RUNCMD='exit 42' ./bin/fresh-node12 > /dev/null || code="$?"
-	assert "$code" "42"
+	assert_equals "$code" "42"
 }
 
 # This verifies both that the documentation is up-to-date with the
@@ -241,7 +313,7 @@ title "mount / cannot write to .git subdirectory file"
 	FRESH_INTERNAL_RUNCMD='echo changed content > /30-git/.git/file.txt' $BASE/bin/fresh-node12 > /dev/null || code="$?"
 	result=$(cat .git/file.txt)
 	assert_lastline "$result" "original content"
-	assert "$code" "2"
+	assert_equals "$code" "2"
 
 	popd
 }
@@ -254,8 +326,8 @@ title "mount / cannot create a .git subdirectory file"
 
 	FRESH_INTERNAL_RUNCMD='touch /40-git/.git/file.txt' $BASE/bin/fresh-node12 > /dev/null || code="$?"
 	result=$(test -f .git/file.txt && echo created file || echo not created)
-	assert "$result" "not created"
-	assert "$code" "1"
+	assert_equals "$result" "not created"
+	assert_equals "$code" "1"
 
 	popd
 }

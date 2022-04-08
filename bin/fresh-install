@@ -87,16 +87,20 @@ def install_bin(version_src, cmd_src, cmd_integrity, cmd_dest):
     req = urllib.request.Request(url, headers={
         'User-Agent': 'Fresh/%s (Bot) https://gerrit.wikimedia.org/g/fresh' % (version_src)
     })
-    try:
-        with urllib.request.urlopen(req) as resp:
-            data = resp.read().decode('utf-8')
-    except urllib.error.HTTPError as e:
-        error_exit('HTTP %s at %s' % (e.code, url))
+    if os.getenv('FRESH_INTERNAL_TEST'):
+        data = '#!/bin/bash\necho "Fake fresh-node"\n'.encode('utf-8')
+        checksum = cmd_integrity
+    else:
+        try:
+            with urllib.request.urlopen(req) as resp:
+                data = resp.read().decode('utf-8')
+        except urllib.error.HTTPError as e:
+            error_exit('HTTP %s at %s' % (e.code, url))
 
-    data = base64.b64decode(data)
+        data = base64.b64decode(data)
+        checksum = hashlib.sha256(data).hexdigest()
 
     # Verify
-    checksum = hashlib.sha256(data).hexdigest()
     if checksum != cmd_integrity:
         error_exit('checksum of %s does not match' % (cmd_src))
 
