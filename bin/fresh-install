@@ -50,8 +50,8 @@ def install_bin_all():
     # Run get_bin_path first to improve message order
     # e.g. not "creating dir" between two "installing" messages
     get_bin_path()
-    install_bin(FRESH_VERSION, 'fresh-node12', FRESH_NODE12_SHA256, 'fresh-node')
-    install_bin(FRESH_VERSION, 'fresh-node14', FRESH_NODE14_SHA256, 'fresh-node14')
+    install_bin(FRESH_VERSION, 'fresh-node12', FRESH_NODE12_SHA256, 'fresh-node12')
+    install_bin(FRESH_VERSION, 'fresh-node14', FRESH_NODE14_SHA256, 'fresh-node')
 
     absent_bin('fresh-node10')
 
