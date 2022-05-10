@@ -43,7 +43,7 @@ def install_bin_all():
 
     # During development this can be a recent commit hash instead of a release tag,
     # to allow full testing prior to release.
-    FRESH_VERSION='4491954af50695b39f37f09c6db64a425719e38d'
+    FRESH_VERSION='22.05.1'
     FRESH_NODE12_SHA256='ceebba84e1ff5f0d287b03a80dccb30f6ce51f2e805f0713d3093a525a9ea166'
     FRESH_NODE14_SHA256='49664b55fc61acad3c60a71e81eaf34b681ac501918077997d708680a3c04d5d'
 
