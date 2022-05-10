@@ -43,9 +43,9 @@ def install_bin_all():
 
     # During development this can be a recent commit hash instead of a release tag,
     # to allow full testing prior to release.
-    FRESH_VERSION='22.01.1'
-    FRESH_NODE12_SHA256='8c9a0c0cbeb23390d5a39da47c57cd67da5bdd7d50a049836108940b76983691'
-    FRESH_NODE14_SHA256='dccced40d1028026a2f352197fd9427f495acd132c1bd1ed472e7fa1adb762ba'
+    FRESH_VERSION='4491954af50695b39f37f09c6db64a425719e38d'
+    FRESH_NODE12_SHA256='ceebba84e1ff5f0d287b03a80dccb30f6ce51f2e805f0713d3093a525a9ea166'
+    FRESH_NODE14_SHA256='49664b55fc61acad3c60a71e81eaf34b681ac501918077997d708680a3c04d5d'
 
     # Run get_bin_path first to improve message order
     # e.g. not "creating dir" between two "installing" messages
@@ -166,7 +166,6 @@ def make_checksum(cmd_src):
 
 debug = (len(sys.argv) == 2 and sys.argv[1] == '--debug')
 if debug:
-    print(get_bin_path())
-    # debug_checksums()
+    debug_checksums()
 else:
     install_bin_all()

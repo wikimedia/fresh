@@ -1,3 +1,18 @@
+22.05.1
+==================
+
+### Added
+
+* fresh-install: Support installing to `~/.local/bin` for Linux. (Antoine Musso) [T282879](https://phabricator.wikimedia.org/T282879)
+
+### Changed
+
+* fresh-install: Promote fresh-node14 to be the default. [T307385](https://phabricator.wikimedia.org/T307385)
+
+## Removed
+
+* fresh-node10: Remove command and uninstall during upgrade. (Timo Tijhof)
+
 22.01.1
 ==================
 
@@ -40,15 +55,15 @@
 
 ### Fixed
 
-* Containers now exit automatically when closing a terminal tab (Timo Tijhof)
+* Containers now exit automatically when closing a terminal tab. (Timo Tijhof)
 
 21.01.1 / 2021-01-27
 ==================
 
 ### Added
 
-* Add `--env-sauce` flag to support forwarding SAUCE_ environment variables (Timo Tijhof)
-* Add support for Podman, an alternative container execution tool to Docker (Timo Tijhof & Kunal Mehta) [T259974](https://phabricator.wikimedia.org/T259974)
+* Add `--env-sauce` flag to support forwarding SAUCE_ environment variables. (Timo Tijhof)
+* Add support for Podman, an alternative container execution tool to Docker. (Timo Tijhof & Kunal Mehta) [T259974](https://phabricator.wikimedia.org/T259974)
 
 ### Changed
 

@@ -4,7 +4,7 @@
 #
 # This is free and unencumbered software released into the public domain.
 
-scriptversion='22.01.1'
+scriptversion='22.05.1'
 imagename=docker-registry.wikimedia.org/releng/node12-test-browser
 imageversion=0.0.3-s3
 shortname=fresh-node12
