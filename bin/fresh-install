@@ -43,15 +43,17 @@ def install_bin_all():
 
     # During development this can be a recent commit hash instead of a release tag,
     # to allow full testing prior to release.
-    FRESH_VERSION='22.05.1'
+    FRESH_VERSION='84aa544ddb01d77bc691cbd0f33f64893470bd0b'
     FRESH_NODE12_SHA256='ceebba84e1ff5f0d287b03a80dccb30f6ce51f2e805f0713d3093a525a9ea166'
     FRESH_NODE14_SHA256='49664b55fc61acad3c60a71e81eaf34b681ac501918077997d708680a3c04d5d'
+    FRESH_NODE16_SHA256='be585d1d360cf336432f99f24ab67711afd5dc22ee5f068ab10802489966e01d'
 
     # Run get_bin_path first to improve message order
     # e.g. not "creating dir" between two "installing" messages
     get_bin_path()
     install_bin(FRESH_VERSION, 'fresh-node12', FRESH_NODE12_SHA256, 'fresh-node12')
     install_bin(FRESH_VERSION, 'fresh-node14', FRESH_NODE14_SHA256, 'fresh-node')
+    install_bin(FRESH_VERSION, 'fresh-node16', FRESH_NODE16_SHA256, 'fresh-node16')
 
     absent_bin('fresh-node10')
 
@@ -66,6 +68,7 @@ def debug_checksums():
     """
     make_checksum('fresh-node12')
     make_checksum('fresh-node14')
+    make_checksum('fresh-node16')
 
 
 def warning(message):
