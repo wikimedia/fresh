@@ -1,3 +1,14 @@
+22.09.1
+==================
+
+### Added
+
+* Add command `fresh-node16` which comes with Node.js 16 and npm 7 (James Forrester) [T314347](https://phabricator.wikimedia.org/T314347)
+* fresh-node16: Compared to fresh-node15, this effectively includes:
+  * Update Chromium from 97 to 103.
+  * Update Mozilla Firefox from 91.5.0esr to 91.11.0esr.
+* fresh-install: Promote fresh-node16 to be the default. (Timo Tijhof)
+
 22.05.1
 ==================
 
@@ -26,11 +37,11 @@
 * fresh-node12: Bump image to `releng/node12-test-browser:0.0.3-s3`.
   * Update npm from 7.5.2 to 7.21.0.
   * Update Chromium from 90 to 97.
-  * Update Mozila Firefox from 78esr to 91esr.
+  * Update Mozilla Firefox from 78esr to 91esr.
 * fresh-node14: Bump image to `releng/node14-test-browser:0.0.2-s4`.
   * Update npm from 7.5.2 to 7.21.0.
   * Update Chromium from 90 to 97.
-  * Update Mozila Firefox from 78esr to 91esr.
+  * Update Mozilla Firefox from 78esr to 91esr.
 
 21.09.1
 ==================
@@ -51,7 +62,7 @@
 
 * Bump Docker image to `node10-test-browser:0.6.3-s2`.
   * Updated Chromium from 71 to 73.
-  * Updated Mozila Firefox from 68.11.0esr to 68.12.0esr.
+  * Updated Mozilla Firefox from 68.11.0esr to 68.12.0esr.
 
 ### Fixed
 
