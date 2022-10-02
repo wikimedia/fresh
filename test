@@ -13,6 +13,16 @@ ISLINUX=$(test "$(uname -s)" = "Linux" && echo "1" || echo "")
 # Add at least /usr/local, because Docker or Podman may be there.
 export PATH="$PATH:/usr/local/bin/"
 
+ENV_IGNORE=("_" "SHLVL" "PWD" "OLDPWD" "PATH")
+clean_env() {
+	for name in $(compgen -e); do
+		if [[ ! " ${ENV_IGNORE[*]} " =~ " ${name} " ]]; then
+			# echo "... unset $name"
+			unset -v "$name"
+		fi
+	done
+}
+
 cd $BASE
 
 trim() {
@@ -31,10 +41,12 @@ popd() {
 }
 
 title() {
+	clean_fs
+	clean_env
+
 	echo
 	echo "test: $1..."
 }
-
 
 if_mac() {
 	test -n "$ISMAC" && $1 || echo "      [skip: mac-only]"
@@ -79,16 +91,15 @@ assert_msg() {
 	printf "      $1\n"
 }
 
-cleanup() {
+clean_fs() {
 	rm -rf ./fixtures
 }
-cleanup
-trap cleanup 0 ERR
+trap clean_fs 0 ERR
 
 title "install / install to ~/.local/bin"
 {
-	mkdir -p fixtures/10-install/myhome
-	pushd fixtures/10-install
+	mkdir -p fixtures/install/myhome
+	pushd fixtures/install
 	myhome="$PWD/myhome"
 	mypath="/bin:/usr/bin:$myhome/.local/bin"
 
@@ -105,8 +116,8 @@ title "install / install to ~/.local/bin"
 
 title "install / install to ~/bin"
 {
-	mkdir -p fixtures/20-install/myhome
-	pushd fixtures/20-install
+	mkdir -p fixtures/install/myhome
+	pushd fixtures/install
 	myhome="$PWD/myhome"
 	mypath="/bin:/usr/bin:$myhome/bin"
 
@@ -123,8 +134,8 @@ title "install / install to ~/bin"
 
 title "install / cannot find a place"
 {
-	mkdir -p fixtures/30-install/myhome
-	pushd fixtures/30-install
+	mkdir -p fixtures/install/myhome
+	pushd fixtures/install
 	myhome="$PWD/myhome"
 	mypath="/bin:/usr/bin"
 	code=0
@@ -175,8 +186,8 @@ title "environment / default CHROMIUM_FLAGS"
 
 title "environment / warn if no MW_ vars with -env-mw"
 {
-	mkdir -p fixtures/10-env-mw
-	pushd fixtures/10-env-mw
+	mkdir -p fixtures/myproject
+	pushd fixtures/myproject
 
 	result=$(FRESH_INTERNAL_RUNCMD='exit' $BASE/bin/fresh-node12 -env-mw)
 	assert_contains "$result" "env: MW_*, MEDIAWIKI_* (none found)"
@@ -214,8 +225,8 @@ title "environment / inherit MEDIAWIKI_FOO with -env"
 
 title "environment / inherit MEDIAWIKI_BAR .env file with -env"
 {
-	mkdir -p fixtures/10-env
-	pushd fixtures/10-env
+	mkdir -p fixtures/myproject
+	pushd fixtures/myproject
 	echo "MEDIAWIKI_BAR=inherited" > .env
 
 	result=$(FRESH_INTERNAL_RUNCMD='echo $MEDIAWIKI_BAR' $BASE/bin/fresh-node12 -env)
@@ -226,8 +237,8 @@ title "environment / inherit MEDIAWIKI_BAR .env file with -env"
 
 title "environment / inherit MEDIAWIKI_BAZ .env file with -env, overriding exported var"
 {
-	mkdir -p fixtures/20-env
-	pushd fixtures/20-env
+	mkdir -p fixtures/myproject
+	pushd fixtures/myproject
 
 	export MEDIAWIKI_BAZ="inherited"
 	echo "MEDIAWIKI_BAZ=overridden" > .env
@@ -239,14 +250,9 @@ title "environment / inherit MEDIAWIKI_BAZ .env file with -env, overriding expor
 
 title "environment / warn if no SAUCE_ vars with -env-sauce"
 {
-	mkdir -p fixtures/30-env
-	pushd fixtures/30-env
-
 	export MEDIAWIKI_FOO="FOO"
 	result=$(FRESH_INTERNAL_RUNCMD='exit' $BASE/bin/fresh-node12 -env-sauce)
 	assert_contains "$result" "env: SAUCE_* (none found)"
-
-	popd
 }
 
 title "environment / protect FOO even with -env"
@@ -280,11 +286,11 @@ title "user / with -root"
 
 title "mount / expose current directory as readable"
 {
-	mkdir -p fixtures/some/dir/10-read
-	pushd fixtures/some/dir/10-read
+	mkdir -p fixtures/myread
+	pushd fixtures/myread
 	echo "exposed content" > file.txt
 
-	result=$(FRESH_INTERNAL_RUNCMD='cat /10-read/file.txt' $BASE/bin/fresh-node12) || true
+	result=$(FRESH_INTERNAL_RUNCMD='cat /myread/file.txt' $BASE/bin/fresh-node12) || true
 	assert_lastline "$result" "exposed content"
 
 	popd
@@ -292,11 +298,11 @@ title "mount / expose current directory as readable"
 
 title "mount / expose current directory as writable"
 {
-	mkdir -p fixtures/some/dir/20-write
-	pushd fixtures/some/dir/20-write
+	mkdir -p fixtures/mywrite
+	pushd fixtures/mywrite
 	echo "original content" > file.txt
 
-	FRESH_INTERNAL_RUNCMD='echo changed content > /20-write/file.txt' $BASE/bin/fresh-node12 > /dev/null || true
+	FRESH_INTERNAL_RUNCMD='echo changed content > /mywrite/file.txt' $BASE/bin/fresh-node12 > /dev/null || true
 	result=$(cat file.txt)
 	assert_lastline "$result" "changed content"
 
@@ -305,12 +311,12 @@ title "mount / expose current directory as writable"
 
 title "mount / cannot write to .git subdirectory file"
 {
-	mkdir -p fixtures/some/dir/30-git/.git
-	pushd fixtures/some/dir/30-git
+	mkdir -p fixtures/myproject/.git
+	pushd fixtures/myproject
 	echo "original content" > .git/file.txt
 	code=0
 
-	FRESH_INTERNAL_RUNCMD='echo changed content > /30-git/.git/file.txt' $BASE/bin/fresh-node12 > /dev/null || code="$?"
+	FRESH_INTERNAL_RUNCMD='echo changed content > /myproject/.git/file.txt' $BASE/bin/fresh-node12 > /dev/null || code="$?"
 	result=$(cat .git/file.txt)
 	assert_lastline "$result" "original content"
 	assert_equals "$code" "2"
@@ -320,11 +326,11 @@ title "mount / cannot write to .git subdirectory file"
 
 title "mount / cannot create a .git subdirectory file"
 {
-	mkdir -p fixtures/some/dir/40-git/.git
-	pushd fixtures/some/dir/40-git
+	mkdir -p fixtures/myproject/.git
+	pushd fixtures/myproject
 	code=0
 
-	FRESH_INTERNAL_RUNCMD='touch /40-git/.git/file.txt' $BASE/bin/fresh-node12 > /dev/null || code="$?"
+	FRESH_INTERNAL_RUNCMD='touch /myproject/.git/file.txt' $BASE/bin/fresh-node12 > /dev/null || code="$?"
 	result=$(test -f .git/file.txt && echo created file || echo not created)
 	assert_equals "$result" "not created"
 	assert_equals "$code" "1"
