@@ -248,18 +248,49 @@ title "environment / inherit MEDIAWIKI_BAZ .env file with -env, overriding expor
 	popd
 }
 
+title "environment / warn if no BROWSERSTACK_ vars with -env-bs"
+{
+	export FOO="inherited"
+	result=$(FRESH_INTERNAL_RUNCMD='exit' $BASE/bin/fresh-node16 -env-bs)
+	assert_contains "$result" "env: BROWSERSTACK_* (none found)"
+}
+
+title "environment / inherit BROWSERSTACK vars with -env-bs"
+{
+	export BROWSERSTACK_KEY="quay"
+	result=$(FRESH_INTERNAL_RUNCMD='echo $BROWSERSTACK_KEY' $BASE/bin/fresh-node16 -env-bs)
+	assert_lastline "$result" "quay"
+}
+
 title "environment / warn if no SAUCE_ vars with -env-sauce"
 {
-	export MEDIAWIKI_FOO="FOO"
+	export FOO="inherited"
 	result=$(FRESH_INTERNAL_RUNCMD='exit' $BASE/bin/fresh-node16 -env-sauce)
 	assert_contains "$result" "env: SAUCE_* (none found)"
 }
 
-title "environment / protect FOO even with -env"
+title "environment / inherit SAUCE vars with -env-sauce"
+{
+	export SAUCE_ACCESS_KEY="caye"
+	result=$(FRESH_INTERNAL_RUNCMD='echo $SAUCE_ACCESS_KEY' $BASE/bin/fresh-node16 -env-sauce)
+	assert_lastline "$result" "caye"
+}
+
+title "environment / protect FOO even with -env-mw"
 {
 	export FOO="inherited"
-	result=$(FRESH_INTERNAL_RUNCMD='echo $FOO' ./bin/fresh-node16 -env)
+	result=$(FRESH_INTERNAL_RUNCMD='echo $FOO' ./bin/fresh-node16 -env-mw)
 	assert_lastline "$result" ""
+}
+
+title "environment / inherit FOO with -env=FOO"
+{
+	export FOO="one"
+	export FOOLING="two"
+	export BAR="nope"
+	export BAR_FOO="nah"
+	result=$(FRESH_INTERNAL_RUNCMD='echo $FOO $BAR $BAR_FOO $FOOLING' ./bin/fresh-node16 -env=FOO)
+	assert_lastline "$result" "one two"
 }
 
 title "user / default (Linux)"

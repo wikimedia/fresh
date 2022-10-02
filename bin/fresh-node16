@@ -14,10 +14,10 @@ instance_tmp_name="fresh_$(basename "$PWD")_$RANDOM"
 welcometxt_suffix=
 envfile=
 docker_args=()
+env_prefixes=()
 
 # Parse options
 allow_env_mw=
-allow_env_sauce=
 allow_net=
 allow_root=
 use_podman=
@@ -28,16 +28,25 @@ DOCKER_BIN=docker
 for arg in "$@"; do
 	case "$arg" in
 		# Option: -env-mw
-		#   Forward "MW_*" and "MEDIAWIKI_*" environment variables from the host machine
-		#   to the Fresh container. This is designed for use with MediaWiki browser and API tests.
-		#   If a .env file exists in the directory, its MW_* and MEDIAWIKI_* environment
-		#   variables will be forwarded to the container; the variables set in .env
-		#   take precedence over variables set at runtime via e.g. export or .bashrc
+		#   Forward `MW_*` and `MEDIAWIKI_*` environment variables from the host machine
+		#   to the Fresh container. This is designed for use with MediaWiki tests.
+		#   If an `.env` file exists in the current directory, its `MW_*` and `MEDIAWIKI_` entries
+		#   will also be read and forwarded to the container.
+		#   Note that the variables set in via `.env` take precedence over variables set at
+		#   runtime e.g. from `export` commands in `.bashrc`.
 		-e|-env|-env-mw) allow_env_mw=1 ;;
+		# Option: -env-bs
+		#   Forward `BROWSERSTACK_*` environment variables from the host to the Fresh container.
+		#   This is designed for running tests involving BrowserStack.
+		-env-bs) env_prefixes+=("BROWSERSTACK_") ;;
 		# Option: -env-sauce
-		#   Forward "SAUCE_*" environment variables from the host machine to the Fresh container.
+		#   Forward `SAUCE_*` environment variables from the host to the Fresh container.
 		#   This is designed for debugging browser tests involving webdriver and SauceLabs.
-		-env-sauce) allow_env_sauce=1 ;;
+		-env-sauce) env_prefixes+=("SAUCE_") ;;
+		# Option: -env=PREFIX
+		#   Forward any environment variables with a given prefix from the host to the Fresh container.
+		#   To forward all environment variables, use `-env=`.
+		-env=*|--env=*) env_prefixes+=("${arg#*=}") ;;
 		# Option: -net
 		#   This exposes network ports from the host machine to the Fresh container.
 		#   For example, to enable access to a MediaWiki web server.
@@ -53,7 +62,7 @@ for arg in "$@"; do
 		-podman) use_podman=1 ;;
 		*)
 		echo "unknown option: $arg" 1>&2
-		echo "usage: $shortname [-env-mw] [-env-sauce] [-net] [-root] [-podman]" 1>&2
+		echo "usage: $shortname [-env-mw] [-env-bs] [-env-sauce] [env=PREFIX] [-net] [-root] [-podman]" 1>&2
 		echo "to run a specific command: FRESH_INTERNAL_RUNCMD=\"...cmd...\" $shortname" 1>&2
 		exit 1
 		;;
@@ -89,17 +98,17 @@ if [ -n "$use_podman" ]; then
 	bind_fastread=
 	welcometxt_suffix+="# ${CLR_PINK}runtime: podman${CLR_NONE}\n"
 fi
-if [ -n "$allow_env_mw" ] || [ -n "$allow_env_sauce" ]; then
+if [ -n "$allow_env_mw" ] || [ "${#env_prefixes[@]}" -ne 0 ]; then
 	envfile="$(mktemp)"
 	docker_args+=("--env-file" "$envfile")
 fi
 if [ -n "$allow_env_mw" ]; then
 	# Backslash for grep bypasses user-defined aliases. – https://github.com/wikimedia/fresh/pull/7
-	mwenvtext=$(env | \grep -E 'MW_|MEDIAWIKI_' || true)
+	mwenvtext=$(env | \grep -E '^(MW_|MEDIAWIKI_)' || true)
 	# Also consider any ".env" file in the current working directory (T246586)
-	# The env file takes precendence over runtime variables from bash exports or bashrc.
+	# Do this last so that local .env takes precendence over global variables exported from bash.
 	if [ -f .env ]; then
-		mwenvtext="${mwenvtext}\n$(\grep -E 'MW_|MEDIAWIKI_' .env)"
+		mwenvtext="${mwenvtext}\n$(\grep -E '^(MW_|MEDIAWIKI_)' .env)"
 	fi
 	# Check if we got at least one non-empty non-whitespace line
 	if printf "$mwenvtext" | grep "\S" >> "$envfile"; then
@@ -108,12 +117,16 @@ if [ -n "$allow_env_mw" ]; then
 		welcometxt_suffix+="# ${CLR_RED}env: MW_*, MEDIAWIKI_* (none found)${CLR_NONE}\n"
 	fi
 fi
-if [ -n "$allow_env_sauce" ]; then
-	if env | \grep -E 'SAUCE_' >> "$envfile"; then
-		welcometxt_suffix+="# ${CLR_YELLOW}env: SAUCE_*${CLR_NONE}\n"
-	else
-		welcometxt_suffix+="# ${CLR_RED}env: SAUCE_* (none found)${CLR_NONE}\n"
-	fi
+if [ "${#env_prefixes[@]}" -ne 0 ]; then
+	for envprefix in "${env_prefixes[@]}"; do
+		if [ -n "$envprefix" ]; then
+			if env | \grep -E "^$envprefix" >> "$envfile"; then
+				welcometxt_suffix+="# ${CLR_YELLOW}env: $envprefix*${CLR_NONE}\n"
+			else
+				welcometxt_suffix+="# ${CLR_RED}env: $envprefix* (none found)${CLR_NONE}\n"
+			fi
+		fi
+	done
 fi
 if [ -n "$allow_net" ]; then
 	welcometxt_suffix+="# ${CLR_YELLOW}net: expose host${CLR_NONE}\n"
