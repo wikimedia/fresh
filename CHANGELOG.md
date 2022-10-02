@@ -1,3 +1,15 @@
+22.11.1
+==================
+
+### Added
+
+* fresh-node16: Add `--env-bs` option to forward BrowserStack environment variables. (Timo Tijhof)
+* fresh-node16: Add `--env=PREFIX` option to forward any environment variables. (Timo Tijhof)
+
+### Changed
+
+* fresh-install: Improve error message for ZSH on macOS 10.15+. (Peter Hedenskog) [T310490](https://phabricator.wikimedia.org/T310490)
+
 22.09.1
 ==================
 
