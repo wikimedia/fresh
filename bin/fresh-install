@@ -138,10 +138,12 @@ def get_bin_path():
             break
 
     if bin_dir is False:
+        using_zsh = os.path.exists(os.path.expanduser('~/.zshrc'))
+        shell_configuration = "~/.zshrc" if using_zsh else "~/.bashrc"
         # If we fail, recommend one that doesn't require sudo (e.g. standard home path)
         bin_recommend = '~/.local/bin'
         warning('Tried the following places: %s' % ', '.join(bin_candidates))
-        warning('Set "PATH=$PATH%s%s" in ~/.bashrc and try again.' % (os.pathsep, bin_recommend))
+        warning('Add "export PATH=$PATH%s%s" in %s and try again.' % (os.pathsep, bin_recommend, shell_configuration))
         error_exit('Could not find writable installation folder')
 
     return bin_dir
