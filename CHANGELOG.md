@@ -1,3 +1,13 @@
+22.11.2
+==================
+
+### Changed
+
+* fresh-node16: Update image to docker-registry.wikimedia.org/releng/node16-test-browser:0.1.0
+  * Update Node.js from 16.16.0 to 16.19.1.
+  * Update Firefox from 91.11.0esr to 102.8.0esr.
+  * Update Chromium from 103 to 110.
+
 22.11.1
 ==================
 

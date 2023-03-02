@@ -4,9 +4,9 @@
 #
 # This is free and unencumbered software released into the public domain.
 
-scriptversion='22.11.1'
+scriptversion='22.11.2'
 imagename=docker-registry.wikimedia.org/releng/node16-test-browser
-imageversion=0.0.1
+imageversion=0.1.0
 shortname=fresh-node16
 mountsrc="$PWD"
 mountdest="/"$(basename "$PWD")
@@ -171,9 +171,9 @@ echo -e '\033]2;'"$shortname"'\007\c'
 welcomecmd="echo \"$CLR_GREY# fresh: $CLR_BOLD$scriptversion$CLR_NONE$CLR_GREY
 # image: $imagename:$imageversion
 # software: Debian GNU/Linux 11 (bullseye)
-#           Node.js v16.16.0 (npm 7.21.0)
-#           Chromium 103.0.5060.114
-#           Mozilla Firefox 91.11.0esr
+#           Node.js v16.19.1 (npm 7.21.0)
+#           Chromium 110.0.5481.77
+#           Mozilla Firefox 102.8.0esr
 #           JSDuck 5.3.4 (Ruby 2.7.4) ruby 2.7.4p191
 # mount: $mountdest      ➟ $mountsrc      (read-write)
 $welcometxt_suffix
