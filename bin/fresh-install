@@ -43,10 +43,10 @@ def install_bin_all():
 
     # During development this can be a recent commit hash instead of a release tag,
     # to allow full testing prior to release.
-    FRESH_VERSION='22.11.2'
-    FRESH_NODE12_SHA256='955162560aca94d829b57043bbbbd30f8002af9a48e8ecd6a3d82e96af36d5c6'
-    FRESH_NODE14_SHA256='55b4adcf0f785214605e93fa8904e05e4331b68db6d9dbe6860915bc778b1a96'
-    FRESH_NODE16_SHA256='79ed2fc7fc95aff9d4e3835b9c7a5917ebb862650f874292b690f9df2bfdad89'
+    FRESH_VERSION='22.11.3'
+    FRESH_NODE12_SHA256='a9974fd493ea5f47770b9caca0552eac10801b3a14a17ee0aa63019573e511c2'
+    FRESH_NODE14_SHA256='66e465da449c1413c8840aae056cea8944e7b7ed1d36aec0e33ee2ed9bbde4cb'
+    FRESH_NODE16_SHA256='4933b2b11332a424d083d5f3a58069c38907829043281bc250b39b0549748a2f'
 
     # Run get_bin_path first to improve message order
     # e.g. not "creating dir" between two "installing" messages
