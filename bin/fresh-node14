@@ -24,8 +24,14 @@ use_podman=
 bind_git_ro=
 bind_fastwrite=',consistency=delegated'
 bind_fastread=',consistency=cached'
+in_positional_args=
+POSITIONAL_ARGS=()
 DOCKER_BIN=docker
 for arg in "$@"; do
+	if [ -n "$in_positional_args" ]; then
+		POSITIONAL_ARGS+=($arg)
+		continue
+	fi
 	case "$arg" in
 		# Option: -env-mw
 		#   Forward "MW_*" and "MEDIAWIKI_*" environment variables from the host machine
@@ -51,10 +57,11 @@ for arg in "$@"; do
 		#   Force use of Podman instead of Docker.
 		#   By default, Fresh uses whichever runtime is available, selecting Docker if both are.
 		-podman) use_podman=1 ;;
+		--) in_positional_args=1 ;;
 		*)
 		echo "unknown option: $arg" 1>&2
-		echo "usage: $shortname [-env-mw] [-env-sauce] [-net] [-root] [-podman]" 1>&2
-		echo "to run a specific command: FRESH_INTERNAL_RUNCMD=\"...cmd...\" $shortname" 1>&2
+		echo "usage: $shortname [-env-mw] [-env-sauce] [-net] [-root] [-podman] [-- command]" 1>&2
+		echo "to run a command in the container, pass it after --" 1>&2
 		exit 1
 		;;
 	esac
@@ -178,6 +185,8 @@ printf \"\n# image: $imagename:$imageversion
 #           \$(firefox --version)
 #           \$(jsduck --version) \$(ruby --version | cut -d' ' -f1-2)\n\""
 	fi
+elif [ ${#POSITIONAL_ARGS[@]} -gt 0 ]; then
+	runcmd="${POSITIONAL_ARGS[@]}"
 else
 	docker_args+=("--interactive" "--tty")
 	runcmd=bash
