@@ -166,12 +166,6 @@ title "runcmd"
 	assert_lastline "$result" 42
 }
 
-title "FRESH_INTERNAL_RUNCMD"
-{
-	result=$(FRESH_INTERNAL_RUNCMD='echo 42' ./bin/fresh-node16)
-	assert_lastline "$result" 42
-}
-
 title "forward exit code"
 {
 	code=0
@@ -189,7 +183,7 @@ title "packages / advertised software versions"
 	# that we need to strip out for the "contains" assertion to work.
 	# This is currently done naturally by the output having a line break at the start and end,
 	# and grepping only for lines we are intersted in.
-	result_live=$(FRESH_INTERNAL_RUNCMD=_fresh_versions ./bin/fresh-node16 | grep --color=never '#')
+	result_live=$(FRESH_INTERNAL_RUNCMD=_fresh_versions ./bin/fresh-node16 | grep --color=never '░')
 	assert_contains "$result_welcome" "$result_live"
 }
 

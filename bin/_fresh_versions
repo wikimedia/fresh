@@ -1,0 +1,13 @@
+#!/bin/bash -eu
+
+. /etc/os-release
+
+R_NUM='s/[^0-9]*\([0-9]*\).*/\1/'
+
+printf "\n\
+░ Node.js $(node --version | sed $R_NUM) \
+░ npm $(npm --version | sed $R_NUM) \
+░ Firefox $(firefox --version | sed $R_NUM) \
+░ Chromium $(chromium --product-version 2>/dev/null | sed $R_NUM) \
+░ Debian $VERSION_ID ${VERSION_CODENAME^}\
+\n";

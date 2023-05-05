@@ -21,7 +21,6 @@ allow_env_mw=
 allow_net=
 allow_root=
 use_podman=
-bind_git_ro=
 bind_fastwrite=',consistency=delegated'
 bind_fastread=',consistency=cached'
 in_positional_args=
@@ -86,10 +85,6 @@ CLR_YELLOW=$(tput setaf 3 2>/dev/null || true)
 CLR_PINK=$(tput setaf 5 2>/dev/null || true)
 CLR_GREY=$(tput setaf 7 2>/dev/null || true)
 
-if [ -e "$mountsrc/.git" ]; then
-	bind_git_ro=1
-	welcometxt_suffix+="#        $mountdest/.git ➟ $mountsrc/.git (read-only)\n"
-fi
 if [ -z "$use_podman" ]; then
 	# Prefer `hash` over `which` or `command` for improved portability and
 	# performance, specific to Bash. - https://stackoverflow.com/a/677212/319266
@@ -103,7 +98,11 @@ if [ -n "$use_podman" ]; then
 	# - https://phabricator.wikimedia.org/T259974#6713393
 	bind_fastwrite=
 	bind_fastread=
-	welcometxt_suffix+="# ${CLR_PINK}runtime: podman${CLR_NONE}\n"
+	welcometxt_suffix+="\n# ${CLR_PINK}runtime: podman${CLR_NONE}"
+fi
+if [ -e "$mountsrc/.git" ]; then
+	welcometxt_suffix+="\n#        $mountdest/.git ➟ $mountsrc/.git (read-only)"
+	docker_args+=("--mount" "type=bind,source=$mountsrc/.git,target=$mountdest/.git,readonly$bind_fastread")
 fi
 if [ -n "$allow_env_mw" ] || [ "${#env_prefixes[@]}" -ne 0 ]; then
 	envfile="$(mktemp)"
@@ -119,24 +118,24 @@ if [ -n "$allow_env_mw" ]; then
 	fi
 	# Check if we got at least one non-empty non-whitespace line
 	if printf "$mwenvtext" | grep "\S" >> "$envfile"; then
-		welcometxt_suffix+="# ${CLR_YELLOW}env: MW_*, MEDIAWIKI_*${CLR_NONE}\n"
+		welcometxt_suffix+="\n# ${CLR_YELLOW}env: MW_*, MEDIAWIKI_*${CLR_NONE}"
 	else
-		welcometxt_suffix+="# ${CLR_RED}env: MW_*, MEDIAWIKI_* (none found)${CLR_NONE}\n"
+		welcometxt_suffix+="\n# ${CLR_RED}env: MW_*, MEDIAWIKI_* (none found)${CLR_NONE}"
 	fi
 fi
 if [ "${#env_prefixes[@]}" -ne 0 ]; then
 	for envprefix in "${env_prefixes[@]}"; do
 		if [ -n "$envprefix" ]; then
 			if env | \grep -E "^$envprefix" >> "$envfile"; then
-				welcometxt_suffix+="# ${CLR_YELLOW}env: $envprefix*${CLR_NONE}\n"
+				welcometxt_suffix+="\n# ${CLR_YELLOW}env: $envprefix*${CLR_NONE}"
 			else
-				welcometxt_suffix+="# ${CLR_RED}env: $envprefix* (none found)${CLR_NONE}\n"
+				welcometxt_suffix+="\n# ${CLR_RED}env: $envprefix* (none found)${CLR_NONE}"
 			fi
 		fi
 	done
 fi
 if [ -n "$allow_net" ]; then
-	welcometxt_suffix+="# ${CLR_YELLOW}net: expose host${CLR_NONE}\n"
+	welcometxt_suffix+="\n# ${CLR_YELLOW}net: expose host${CLR_NONE}"
 	docker_args+=("--network" "host")
 fi
 if [ -n "$allow_root" ]; then
@@ -173,39 +172,28 @@ echo -e '\033]2;'"$shortname"'\007\c'
 # commands to generate the welcome message. Instead, prior to a release:
 #
 # 1. Run `FRESH_INTERNAL_RUNCMD=_fresh_versions ./bin/fresh-node`
-# 2. Update the below $welcomecmd value accordingly.
+# 2. Update the welcome_versions string below.
 #
-welcomecmd="echo \"$CLR_GREY# fresh: $CLR_BOLD$scriptversion$CLR_NONE$CLR_GREY
+welcome_versions="░ Node.js 16 ░ npm 7 ░ Firefox 102 ░ Chromium 110 ░ Debian 11 Bullseye"
+
+welcome_text="$CLR_GREY# 🌱 ${CLR_BOLD}${CLR_GREEN}Fresh $scriptversion$CLR_NONE$CLR_GREY $welcome_versions
 # image: $imagename:$imageversion
-# software: Debian GNU/Linux 11 (bullseye)
-#           Node.js v16.19.1 (npm 7.21.0)
-#           Chromium 110.0.5481.77
-#           Mozilla Firefox 102.8.0esr
-#           JSDuck 5.3.4 (Ruby 2.7.4) ruby 2.7.4p191
-# mount: $mountdest      ➟ $mountsrc      (read-write)
-$welcometxt_suffix
-🌱  ${CLR_BOLD}${CLR_GREEN}Fresh!
-$CLR_NONE\""
+# mount: $mountdest      ➟ $mountsrc      (read-write)\
+$CLR_NONE\
+$welcometxt_suffix"
+
 if [ -n "${FRESH_INTERNAL_RUNCMD:-}" ]; then
 	runcmd="$FRESH_INTERNAL_RUNCMD"
 	if [ "$runcmd" == "_fresh_versions" ]; then
-		FRESH_INTERNAL_NOWELCOME=1
-		runcmd=". /etc/os-release
-printf \"\n# image: $imagename:$imageversion
-# software: \$PRETTY_NAME
-#           Node.js \$(node --version) (npm \$(npm --version))
-#           Chromium \$(chromium --product-version)
-#           \$(firefox --version)
-#           \$(jsduck --version) \$(ruby --version | cut -d' ' -f1-2)\n\""
+		BASE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+		docker_args+=("--mount" "type=bind,source=$BASE,target=/_fresh,readonly")
+		runcmd=/_fresh/_fresh_versions
 	fi
 elif [ ${#POSITIONAL_ARGS[@]} -gt 0 ]; then
-	runcmd="${POSITIONAL_ARGS[@]}"
+	runcmd="echo \"$welcome_text\n\";${POSITIONAL_ARGS[@]}"
 else
 	docker_args+=("--interactive" "--tty")
-	runcmd=bash
-fi
-if [ -z "${FRESH_INTERNAL_NOWELCOME:-}" ]; then
-	runcmd="$welcomecmd;$runcmd"
+	runcmd="echo \"$welcome_text\n\";bash"
 fi
 
 # We expand the $docker_args in a special way to avoid passing "",
@@ -214,7 +202,6 @@ fi
 
 $DOCKER_BIN run --rm --name "$instance_tmp_name" -e 'HOME=/tmp' \
 	--mount type=bind,source="$mountsrc",target="$mountdest"$bind_fastwrite \
-	$( if [ -n "$bind_git_ro" ]; then printf %s "--mount type=bind,source="$mountsrc"/.git,target="$mountdest"/.git,readonly"$bind_fastread; fi ) \
 	${docker_args[@]+"${docker_args[@]}"} \
 	--entrypoint /bin/sh \
 	--security-opt label=disable \
