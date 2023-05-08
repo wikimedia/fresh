@@ -43,10 +43,10 @@ def install_bin_all():
 
     # During development this can be a recent commit hash instead of a release tag,
     # to allow full testing prior to release.
-    FRESH_VERSION='22.11.3'
-    FRESH_NODE12_SHA256='a9974fd493ea5f47770b9caca0552eac10801b3a14a17ee0aa63019573e511c2'
-    FRESH_NODE14_SHA256='66e465da449c1413c8840aae056cea8944e7b7ed1d36aec0e33ee2ed9bbde4cb'
-    FRESH_NODE16_SHA256='4933b2b11332a424d083d5f3a58069c38907829043281bc250b39b0549748a2f'
+    FRESH_VERSION='344488054b143de2e09bab06d2cadc3ea724ff7c'
+    FRESH_NODE12_SHA256='73a047013c350fc87af5f4e9e18abf24f0908b919a2e76cbb1148bc8d97696ec'
+    FRESH_NODE14_SHA256='422890cf40072d12c160b6cebccf737774120421968d7a6fc64529a62d75a791'
+    FRESH_NODE16_SHA256='c9bc0c30c6ea84e0ffe467418beae92668564bce18ac37b24ecbfc28f5924e15'
 
     # Run get_bin_path first to improve message order
     # e.g. not "creating dir" between two "installing" messages
@@ -56,6 +56,7 @@ def install_bin_all():
     install_bin(FRESH_VERSION, 'fresh-node16', FRESH_NODE16_SHA256, 'fresh-node')
 
     absent_bin('fresh-node10')
+    absent_bin('fresh-node16')
 
     print('')
     print('%s  Fresh %s is now ready!' % (u'\U0001F331', FRESH_VERSION))

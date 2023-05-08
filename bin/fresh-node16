@@ -4,9 +4,9 @@
 #
 # This is free and unencumbered software released into the public domain.
 
-scriptversion='22.11.3'
+scriptversion='23.05.1'
 imagename=docker-registry.wikimedia.org/releng/node16-test-browser
-imageversion=0.1.0
+imageversion=0.2.0
 shortname=fresh-node16
 mountsrc="$PWD"
 mountdest="/"$(basename "$PWD")
@@ -174,7 +174,7 @@ echo -e '\033]2;'"$shortname"'\007\c'
 # 1. Run `FRESH_INTERNAL_RUNCMD=_fresh_versions ./bin/fresh-node`
 # 2. Update the welcome_versions string below.
 #
-welcome_versions="░ Node.js 16 ░ npm 7 ░ Firefox 102 ░ Chromium 110 ░ Debian 11 Bullseye"
+welcome_versions="░ Node.js 16 ░ npm 7 ░ Firefox 102 ░ Chromium 112 ░ Debian 11 Bullseye"
 
 welcome_text="$CLR_GREY# 🌱 ${CLR_BOLD}${CLR_GREEN}Fresh $scriptversion$CLR_NONE$CLR_GREY $welcome_versions
 # image: $imagename:$imageversion

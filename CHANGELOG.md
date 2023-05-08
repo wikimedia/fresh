@@ -1,3 +1,14 @@
+23.05.1
+==================
+
+### Changed
+
+* Add `<command>` positional argument to all fresh-node scripts. For example: `fresh-node -- npm test` (Gergő Tisza) [T253924](https://phabricator.wikimedia.org/T253924)
+* fresh-node16: New and shorter welcome message. (Timo Tijhof)
+* fresh-node16: Update image to docker-registry.wikimedia.org/releng/node16-test-browser:0.2.0
+  * Update Firefox from 102.8.0esr to 102.10.0esr.
+  * Update Chromium from 110 to 112.
+
 22.11.2
 ==================
 
