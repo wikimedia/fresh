@@ -46,22 +46,21 @@ Before you run such commands, use `fresh-node` to enter a Fresh environment.
 you@precious.local:~$ cd myproject/
 you@precious.local:myproject$ fresh-node
 
-# fresh: …
-# image: docker-registry.wikimedia.org/…:…
-# software: Debian Linux …
-#           Node.js … (npm …)
-#           Chromium …
-#           Mozilla Firefox …
-#           JSDuck … (Ruby …)
+# 🌱 Fresh! ░ Node.js … ░ npm … ░ Firefox … ░ Chromium … ░ Debian …
 # mount: /myproject ➟ /Users/you/myproject (read-write)
-
-🌱  Fresh!
 
 nobody@76010858c836:/myproject$
 ```
 
 You can now execute commands such as `npm install`, `npm test`, and
 other `npm run` commands.
+
+It is recommended to keep Fresh environments open for a given project, so that
+subsequent commands can benefit from npm caching, tab completion, and to
+reduce chances of accidentally running commands on your host machine instead.
+
+To run a single command without launching a shell, use `fresh-node -- <command>`,
+e.g. `fresh-node -- npm install`.
 
 ## How does it work
 
