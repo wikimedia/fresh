@@ -21,11 +21,18 @@ allow_env_mw=
 allow_net=
 allow_root=
 use_podman=
+podman_reason=
 bind_fastwrite=',consistency=delegated'
 bind_fastread=',consistency=cached'
 in_positional_args=
 POSITIONAL_ARGS=()
 DOCKER_BIN=docker
+
+function enable_podman {
+	use_podman=1
+	podman_reason=$1
+}
+
 for arg in "$@"; do
 	if [ -n "$in_positional_args" ]; then
 		POSITIONAL_ARGS+=($arg)
@@ -64,7 +71,7 @@ for arg in "$@"; do
 		# Option: -podman
 		#   Force use of Podman instead of Docker.
 		#   By default, Fresh uses whichever runtime is available, selecting Docker if both are.
-		-podman) use_podman=1 ;;
+		-podman) enable_podman "-podman option" ;;
 		--) in_positional_args=1 ;;
 		*)
 		echo "unknown option: $arg" 1>&2
@@ -88,8 +95,22 @@ CLR_GREY=$(tput setaf 7 2>/dev/null || true)
 if [ -z "$use_podman" ]; then
 	# Prefer `hash` over `which` or `command` for improved portability and
 	# performance, specific to Bash. - https://stackoverflow.com/a/677212/319266
-	if ! hash docker 2>/dev/null && hash podman 2>/dev/null; then
-		use_podman=1
+	has_docker=
+	if hash docker 2>/dev/null; then
+		has_docker=1
+	fi
+	has_podman=
+	if hash podman 2>/dev/null; then
+		has_podman=1
+	fi
+
+	if [[ ! $has_docker ]] && [[ $has_podman ]]; then
+		enable_podman "no docker found"
+	elif [ -z "$use_podman" ] && [[ $has_docker ]] && [[ $has_podman ]]; then
+		# In case `docker` is podman
+		if [[ "$(docker -v)" = podman* ]]; then
+			enable_podman "docker -v`` is podman"
+		fi
 	fi
 fi
 if [ -n "$use_podman" ]; then
@@ -98,7 +119,7 @@ if [ -n "$use_podman" ]; then
 	# - https://phabricator.wikimedia.org/T259974#6713393
 	bind_fastwrite=
 	bind_fastread=
-	welcometxt_suffix+="\n# ${CLR_PINK}runtime: podman${CLR_NONE}"
+	welcometxt_suffix+="\n# ${CLR_PINK}runtime: podman ($podman_reason)${CLR_NONE}"
 fi
 if [ -e "$mountsrc/.git" ]; then
 	welcometxt_suffix+="\n#        $mountdest/.git ➟ $mountsrc/.git (read-only)"
