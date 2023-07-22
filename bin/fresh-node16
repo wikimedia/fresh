@@ -161,13 +161,13 @@ if [ -n "$allow_net" ]; then
 fi
 if [ -n "$allow_root" ]; then
 	docker_args+=("--user" "root")
+elif [ -n "$use_podman" ]; then
+	# Ensure the default container user has the same file permissions
+	# as the acting user on the host (match Docker Desktop for Mac behavior),
+	# by mapping host UID/GID into the container. See podman-run(1) manual.
+	docker_args+=("--user" "$(id -u):$(id -g)" "--userns=keep-id")
 elif [ "$(uname -s)" == "Linux" ]; then
 	docker_args+=("--user" "$(id -u):$(id -g)")
-	if [ -n "$use_podman" ]; then
-		# Make sure host UID/GID are mapped into container,
-		# see podman-run(1) manual.
-		docker_args+=("--userns=keep-id")
-	fi
 fi
 
 function teardown {
