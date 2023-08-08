@@ -1,3 +1,25 @@
+23.08.1
+==================
+
+### Added
+
+* Set podman flag when docker is really podman. (Antoine Musso)
+* Set `--user` and `--userns` for Podman on Mac as well. (Timo Tijhof)
+* Add command `fresh-node18` which comes with Node.js 18 and npm 9. (James Forrester) [T337647](https://phabricator.wikimedia.org/T337647)
+* Add command `fresh-node20` which comes with Node.js 20 and npm 9.
+
+### Changed
+
+* fresh-install: Promote fresh-node18 to be the default. (Timo Tijhof)
+* fresh-node16,18,20: Hide "unrequested emulation" warning on Apple ARM. (Timo Tijhof)
+* fresh-node16: Update image to docker-registry.wikimedia.org/releng/node16-test-browser:0.2.1
+  * Update npm from 7.21.0 to 8.19.3.
+  * Update Chromium from 112 to 115.
+
+### Removed
+
+* fresh-node12: Remove command and uninstall during upgrade.
+
 23.05.1
 ==================
 

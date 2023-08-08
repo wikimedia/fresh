@@ -154,22 +154,22 @@ title "install / cannot find a place"
 
 title "basic invocation"
 {
-	./bin/fresh-node16 -- exit > /dev/null
+	./bin/fresh-node18 -- exit > /dev/null
 }
 
 title "runcmd"
 {
-	result=$(./bin/fresh-node16 -- echo 42)
+	result=$(./bin/fresh-node18 -- echo 42)
 	assert_lastline "$result" 42
 
-	result=$(./bin/fresh-node16 -- 'echo 42')
+	result=$(./bin/fresh-node18 -- 'echo 42')
 	assert_lastline "$result" 42
 }
 
 title "forward exit code"
 {
 	code=0
-	./bin/fresh-node16 -- exit 42 > /dev/null || code="$?"
+	./bin/fresh-node18 -- exit 42 > /dev/null || code="$?"
 	assert_equals "$code" "42"
 }
 
@@ -178,18 +178,18 @@ title "forward exit code"
 # documented software and versions thereof.
 title "packages / advertised software versions"
 {
-	result_welcome=$(./bin/fresh-node16 -- exit)
+	result_welcome=$(./bin/fresh-node18 -- exit)
 	# There are invisible control characters at the start and end of the output (window title setup),
 	# that we need to strip out for the "contains" assertion to work.
 	# This is currently done naturally by the output having a line break at the start and end,
 	# and grepping only for lines we are intersted in.
-	result_live=$(FRESH_INTERNAL_RUNCMD=_fresh_versions ./bin/fresh-node16 | grep --color=never '░')
+	result_live=$(FRESH_INTERNAL_RUNCMD=_fresh_versions ./bin/fresh-node18 | grep --color=never '░')
 	assert_contains "$result_welcome" "$result_live"
 }
 
 title "environment / default CHROMIUM_FLAGS"
 {
-	result=$(./bin/fresh-node16 -- 'echo $CHROMIUM_FLAGS')
+	result=$(./bin/fresh-node18 -- 'echo $CHROMIUM_FLAGS')
 	assert_lastline "$result" "--no-sandbox"
 }
 
@@ -198,7 +198,7 @@ title "environment / warn if no MW_ vars with -env-mw"
 	mkdir -p fixtures/myproject
 	pushd fixtures/myproject
 
-	result=$($BASE/bin/fresh-node16 -env-mw -- exit)
+	result=$($BASE/bin/fresh-node18 -env-mw -- exit)
 	assert_contains "$result" "env: MW_*, MEDIAWIKI_* (none found)"
 
 	popd
@@ -207,28 +207,28 @@ title "environment / warn if no MW_ vars with -env-mw"
 title "environment / protect FOO by default"
 {
 	export FOO="inherited"
-	result=$(./bin/fresh-node16 -- 'echo $FOO')
+	result=$(./bin/fresh-node18 -- 'echo $FOO')
 	assert_lastline "$result" ""
 }
 
 title "environment / protect MW_FOO by default"
 {
 	export MW_FOO="inherited"
-	result=$(./bin/fresh-node16 -- 'echo $MW_FOO')
+	result=$(./bin/fresh-node18 -- 'echo $MW_FOO')
 	assert_lastline "$result" ""
 }
 
 title "environment / inherit MW_FOO with -env"
 {
 	export MW_FOO="inherited"
-	result=$(./bin/fresh-node16 -env -- 'echo $MW_FOO')
+	result=$(./bin/fresh-node18 -env -- 'echo $MW_FOO')
 	assert_lastline "$result" "inherited"
 }
 
 title "environment / inherit MEDIAWIKI_FOO with -env"
 {
 	export MEDIAWIKI_FOO="inherited"
-	result=$(./bin/fresh-node16 -env -- 'echo $MEDIAWIKI_FOO')
+	result=$(./bin/fresh-node18 -env -- 'echo $MEDIAWIKI_FOO')
 	assert_lastline "$result" "inherited"
 }
 
@@ -238,7 +238,7 @@ title "environment / inherit MEDIAWIKI_BAR .env file with -env"
 	pushd fixtures/myproject
 	echo "MEDIAWIKI_BAR=inherited" > .env
 
-	result=$($BASE/bin/fresh-node16 -env -- 'echo $MEDIAWIKI_BAR')
+	result=$($BASE/bin/fresh-node18 -env -- 'echo $MEDIAWIKI_BAR')
 	assert_lastline "$result" "inherited"
 
 	popd
@@ -251,7 +251,7 @@ title "environment / inherit MEDIAWIKI_BAZ .env file with -env, overriding expor
 
 	export MEDIAWIKI_BAZ="inherited"
 	echo "MEDIAWIKI_BAZ=overridden" > .env
-	result=$($BASE/bin/fresh-node16 -env -- 'echo $MEDIAWIKI_BAZ')
+	result=$($BASE/bin/fresh-node18 -env -- 'echo $MEDIAWIKI_BAZ')
 	assert_lastline "$result" "overridden"
 
 	popd
@@ -260,35 +260,35 @@ title "environment / inherit MEDIAWIKI_BAZ .env file with -env, overriding expor
 title "environment / warn if no BROWSERSTACK_ vars with -env-bs"
 {
 	export FOO="inherited"
-	result=$($BASE/bin/fresh-node16 -env-bs -- exit)
+	result=$($BASE/bin/fresh-node18 -env-bs -- exit)
 	assert_contains "$result" "env: BROWSERSTACK_* (none found)"
 }
 
 title "environment / inherit BROWSERSTACK vars with -env-bs"
 {
 	export BROWSERSTACK_KEY="quay"
-	result=$($BASE/bin/fresh-node16 -env-bs -- 'echo $BROWSERSTACK_KEY')
+	result=$($BASE/bin/fresh-node18 -env-bs -- 'echo $BROWSERSTACK_KEY')
 	assert_lastline "$result" "quay"
 }
 
 title "environment / warn if no SAUCE_ vars with -env-sauce"
 {
 	export FOO="inherited"
-	result=$($BASE/bin/fresh-node16 -env-sauce -- exit)
+	result=$($BASE/bin/fresh-node18 -env-sauce -- exit)
 	assert_contains "$result" "env: SAUCE_* (none found)"
 }
 
 title "environment / inherit SAUCE vars with -env-sauce"
 {
 	export SAUCE_ACCESS_KEY="caye"
-	result=$($BASE/bin/fresh-node16 -env-sauce -- 'echo $SAUCE_ACCESS_KEY')
+	result=$($BASE/bin/fresh-node18 -env-sauce -- 'echo $SAUCE_ACCESS_KEY')
 	assert_lastline "$result" "caye"
 }
 
 title "environment / protect FOO even with -env-mw"
 {
 	export FOO="inherited"
-	result=$(./bin/fresh-node16 -env-mw -- 'echo $FOO')
+	result=$(./bin/fresh-node18 -env-mw -- 'echo $FOO')
 	assert_lastline "$result" ""
 }
 
@@ -298,14 +298,14 @@ title "environment / inherit FOO with -env=FOO"
 	export FOOLING="two"
 	export BAR="nope"
 	export BAR_FOO="nah"
-	result=$(./bin/fresh-node16 -env=FOO -- 'echo $FOO $BAR $BAR_FOO $FOOLING')
+	result=$(./bin/fresh-node18 -env=FOO -- 'echo $FOO $BAR $BAR_FOO $FOOLING')
 	assert_lastline "$result" "one two"
 }
 
 title "user / default (Linux)"
 λ() {
 	host_uid=$(id -u)
-	result=$(./bin/fresh-node16 -- /usr/bin/id -u)
+	result=$(./bin/fresh-node18 -- /usr/bin/id -u)
 	assert_lastline "$result" "$host_uid"
 }
 if_linux λ
@@ -313,14 +313,14 @@ if_linux λ
 
 title "user / default (macOS)"
 λ() {
-	result=$(./bin/fresh-node16 -- /usr/bin/id -un)
+	result=$(./bin/fresh-node18 -- /usr/bin/id -un)
 	assert_lastline "$result" "nobody"
 }
 if_mac λ
 
 title "user / with -root"
 {
-	result=$(./bin/fresh-node16 -root -- /usr/bin/id -un)
+	result=$(./bin/fresh-node18 -root -- /usr/bin/id -un)
 	assert_lastline "$result" "root"
 }
 
@@ -330,7 +330,7 @@ title "mount / expose current directory as readable"
 	pushd fixtures/myread
 	echo "exposed content" > file.txt
 
-	result=$($BASE/bin/fresh-node16 -- cat /myread/file.txt) || true
+	result=$($BASE/bin/fresh-node18 -- cat /myread/file.txt) || true
 	assert_lastline "$result" "exposed content"
 
 	popd
@@ -342,7 +342,7 @@ title "mount / expose current directory as writable"
 	pushd fixtures/mywrite
 	echo "original content" > file.txt
 
-	$BASE/bin/fresh-node16 -- 'echo changed content > /mywrite/file.txt' > /dev/null || true
+	$BASE/bin/fresh-node18 -- 'echo changed content > /mywrite/file.txt' > /dev/null || true
 	result=$(cat file.txt)
 	assert_lastline "$result" "changed content"
 
@@ -356,7 +356,7 @@ title "mount / cannot write to .git subdirectory file"
 	echo "original content" > .git/file.txt
 	code=0
 
-	$BASE/bin/fresh-node16 -- 'echo changed content > /myproject/.git/file.txt' > /dev/null || code="$?"
+	$BASE/bin/fresh-node18 -- 'echo changed content > /myproject/.git/file.txt' > /dev/null || code="$?"
 	result=$(cat .git/file.txt)
 	assert_lastline "$result" "original content"
 	assert_equals "$code" "2"
@@ -370,7 +370,7 @@ title "mount / cannot create a .git subdirectory file"
 	pushd fixtures/myproject
 	code=0
 
-	$BASE/bin/fresh-node16 -- touch /myproject/.git/file.txt > /dev/null || code="$?"
+	$BASE/bin/fresh-node18 -- touch /myproject/.git/file.txt > /dev/null || code="$?"
 	result=$(test -f .git/file.txt && echo created file || echo not created)
 	assert_equals "$result" "not created"
 	assert_equals "$code" "1"
