@@ -170,6 +170,11 @@ elif [ "$(uname -s)" == "Linux" ]; then
 	docker_args+=("--user" "$(id -u):$(id -g)")
 fi
 
+if [ "$(uname -s)" == "Darwin" ] && [ "$(uname -m)" == "arm64" ]; then
+	# Acknowledge "unrequested emulation" warning on Apple ARM
+	docker_args+=("--platform" "linux/amd64")
+fi
+
 function teardown {
 	# stop and remove temporary container
 	# this should be redundant since 'docker run --rm' is meant to take care of
