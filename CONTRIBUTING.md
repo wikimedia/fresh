@@ -12,7 +12,13 @@ git remote update && git checkout -B release -t origin/HEAD
 
 1. Update the bin scripts:
 
-   * Set `scriptversion` to the new version string.
+   * Set `scriptversion` to the new version string, like so:
+
+     ```
+     read -p "Next version number like XX.YY.ZZ: " FRESH_VERSION;
+     rm -f bin/fresh-*.bak;
+     sed -i'.bak' "s/scriptversion='[0-9a-z\.-]*'/scriptversion='${FRESH_VERSION}'/" bin/fresh-* && rm -f bin/fresh-*.bak;
+     ```
 
    * Run `FRESH_INTERNAL_RUNCMD=_fresh_versions bin/fresh-node`
      for changed scripts and copy the new welcome text into the script.
@@ -36,7 +42,7 @@ git remote update && git checkout -B release -t origin/HEAD
 
    ```
    git add -p
-   git commit -m "Prepare <version> release"
+   git commit -m "Prepare $FRESH_VERSION release"
    git review
    ```
 

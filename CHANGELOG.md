@@ -1,3 +1,45 @@
+24.05.1
+==================
+
+### Added
+
+* Provide fresh-node22. (James D. Forrester)
+
+  Based on Debian 11 Bullseye with Node.js 22, npm 10, Firefox 115,
+  and Chromium 120.
+
+* fresh-npm: initial commit. (Timo Tijhof)
+
+  This is a new opt-in security feature available via `fresh-install --secure-npm`.
+  This shadows the npm command in your shell and avoids accidentally running
+  potentially insecure scripts outside Fresh.
+  Other npm commands are unaffected. It can be bypassed as-needed by
+  specifying the full path to npm, which can also be found at the end
+  of the fresh-npm help message.
+
+### Fixed
+
+* Fix instance name to avoid spaces or other unsupported characters. (Marius Hoch)
+
+### Changed
+
+* fresh-install: Promote fresh-node20 to be the default. (Timo Tijhof)
+* fresh-node18: Update image to docker-registry.wikimedia.org/releng/node18-test-browser:18.20.2-s1. (James Forrester) [T362908](https://phabricator.wikimedia.org/T362908)
+  * Update Node.js from 18.17.0 to 18.20.2.
+  * Update npm from 9 to 10.
+  * Update Firefox from 102 to 115.
+  * Update Chromium from 115 to 120.
+* fresh-node20: Update image to docker-registry.wikimedia.org/releng/node18-test-browser:20.12.2-s1. (James D. Forrester)
+  * Upgrade Node.js from 20.5.0 to 20.12.2.
+  * Update npm from 9 to 10.
+  * Update Firefox from 102 to 115.
+  * Update Chromium from 115 to 120.
+
+### Removed
+
+* fresh-node14: Remove command and uninstall during upgrade. (James D. Forrester)
+* fresh-node18,20,22: Move `HOME=/tmp` to upstream and remove override. (Timo Tijhof) [T365871](https://phabricator.wikimedia.org/T365871)
+
 23.08.1
 ==================
 

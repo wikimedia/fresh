@@ -29,7 +29,7 @@ import os
 import subprocess
 import sys
 
-scriptversion='24.0.0-alpha'
+scriptversion='24.05.1'
 
 # fresh-npm is a security-focussed replacement for the "npm" command. It is installed
 # in your home directory, so that on your terminal "npm" resolves to fresh-npm instead
