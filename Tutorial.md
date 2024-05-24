@@ -4,20 +4,20 @@
 
 The base image is generated from these Docker files:
 
-* [node/Dockerfile](https://github.com/wikimedia/integration-config/blob/2a3f3ff2b41bbdfaf0044dbed23a2272353dcdee/dockerfiles/node12/Dockerfile.template#L1),
-* [node-test/Dockerfile](https://github.com/wikimedia/integration-config/blob/2a3f3ff2b41bbdfaf0044dbed23a2272353dcdee/dockerfiles/node12-test/Dockerfile.template#L1), and
-* [node-test-browser/Dockerfile](https://github.com/wikimedia/integration-config/blob/2a3f3ff2b41bbdfaf0044dbed23a2272353dcdee/dockerfiles/node12-test-browser/Dockerfile.template#L1).
+* [node/Dockerfile](https://github.com/wikimedia/integration-config/blob/0fb154c75de0c4fbc5b0529e40c8785ff4aa309f/dockerfiles/node20/Dockerfile.template),
+* [node-test/Dockerfile](https://github.com/wikimedia/integration-config/blob/0fb154c75de0c4fbc5b0529e40c8785ff4aa309f/dockerfiles/node20-test/Dockerfile.template), and
+* [node-test-browser/Dockerfile](https://github.com/wikimedia/integration-config/blob/0fb154c75de0c4fbc5b0529e40c8785ff4aa309f/dockerfiles/node20-test-browser/Dockerfile.template).
 
 ## Bash script
 
 The bash script that quickly launches a temporary container can be found
-at [bin/fresh-node](./bin/fresh-node#L3).
+at [bin/fresh-node](./bin/fresh-node20).
 
 The script is documented inline, but I'll take apart the most
 import line here as well, the `docker run` command.
 
 ```
-docker run --rm --interactive --tty -e 'HOME=/tmp' \
+docker run --rm --interactive --tty \
 	--mount type=bind,source="$mountsrc",target="$mountdest",consistency=delegated \
 	--mount type=bind,source="$mountsrc"/.git,target="$mountdest"/.git,readonly,consistency=cached \
 	--entrypoint /bin/sh \
@@ -44,11 +44,6 @@ The various options before it decide how the container is configured:
 * `--interactive` `--tty`: These make it possible for you to type into the
   container's bash prompt.
 
-* `-e 'HOME=/tmp'`: The Wikimedia base images run as the unprivileged
-  `nobody` user inside the container, which has no home directory.
-  This is for compatibility with various CLI utilities that assume
-  the `$HOME` directory to exist.
-
 * `--mount`: This is used to expose the current working directory from
   the host machine, to the container. Typically a Git project with source
   code. See [Docker Docs: mount](https://docs.docker.com/storage/bind-mounts/)
@@ -60,3 +55,7 @@ The various options before it decide how the container is configured:
   `/bin/sh -c "cd $mountdest/;$welcomecmd;bash"`. This opens the current
   directory in the container, prints the welcome message, and starts Bash.
 
+The Wikimedia base images run as the unprivileged `nobody` user inside the
+container. This user has no writable home directory. However, we set
+various environment variables to accomodate CLI utilities that assume
+directories such as `$HOME` to exist and be writable ([T365871](https://phabricator.wikimedia.org/T365871)).
