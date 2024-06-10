@@ -72,7 +72,7 @@ title "default response"
 
 title "deny npm-install"
 {
-	result=$(bin/fresh-npm install) || code="$?"
+	result=$(bin/fresh-npm install 2>&1) || code="$?"
 	assert_contains "$result" "command 'install' is disabled or unknown."
 	assert_contains "$result" "Enabled commands:"
 	assert_equals "$code" "1"
