@@ -75,6 +75,7 @@ def install_bin_all(secure_npm=False):
     get_bin_path(bin_candidates)
     install_bin(FRESH_VERSION, 'fresh-node16', FRESH_NODE16_SHA256, 'fresh-node16')
     install_bin(FRESH_VERSION, 'fresh-node18', FRESH_NODE18_SHA256, 'fresh-node18')
+    install_bin(FRESH_VERSION, 'fresh-node20', FRESH_NODE20_SHA256, 'fresh-node20')
     install_bin(FRESH_VERSION, 'fresh-node20', FRESH_NODE20_SHA256, 'fresh-node')
     install_bin(FRESH_VERSION, 'fresh-node22', FRESH_NODE22_SHA256, 'fresh-node22')
     if secure_npm:
