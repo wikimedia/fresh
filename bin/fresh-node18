@@ -6,7 +6,7 @@
 
 scriptversion='24.05.1'
 imagename=docker-registry.wikimedia.org/releng/node18-test-browser
-imageversion=18.20.2-s1
+imageversion=18.20.4
 shortname=fresh-node18
 mountsrc="$PWD"
 mountdest="/"$(basename "$PWD")
