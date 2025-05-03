@@ -6,7 +6,7 @@
 
 scriptversion='24.05.1'
 imagename=docker-registry.wikimedia.org/releng/node20-test-browser
-imageversion=20.18.1
+imageversion=20.19.1
 shortname=fresh-node20
 mountsrc="$PWD"
 mountdest="/"$(basename "$PWD")
