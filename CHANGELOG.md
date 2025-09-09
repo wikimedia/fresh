@@ -1,3 +1,32 @@
+26.03.1
+==================
+
+### Added
+
+* Provide fresh-node24 (James D. Forrester)
+
+  Based on Debian 12 Bookworm with Node.js 24, npm 11, Firefox 128,
+  and Chromium 140.
+
+### Fixed
+
+* Also install fresh-node20 (Lucas Werkmeister) [T367063](https://phabricator.wikimedia.org/T367063)
+
+### Changed
+
+* fresh-node18: Update Node.js from 18.20.2 to 18.20.4 (MusikAnimal) [T373938](https://phabricator.wikimedia.org/T373938)
+* fresh-node20: Update image to docker-registry.wikimedia.org/releng/node20-test-browser:20.19.5 (Marius Hoch; James D. Forrester) [T384342](https://phabricator.wikimedia.org/T384342)
+  * Update Node.js from 20.12.2 to 20.19.5.
+  * Update Debian from 11 Bullseye to 12 Bookworm.
+  * Update Firefox from 115 to 128.
+  * Update Chromium from 120 to 140.
+* fresh-node22: Update image to docker-registry.wikimedia.org/releng/node22-test-browser:22.19.0 (Marius Hoch; James D. Forrester) [T384342](https://phabricator.wikimedia.org/T384342)
+  * Update Node.js from 22.0.0 to 22.19.0.
+  * Update Debian from 11 Bullseye to 12 Bookworm.
+  * Update Firefox from 115 to 128.
+  * Update Chromium from 120 to 140.
+* fresh-npm: write "command install is disabled" to stderr (Timo Tijhof)
+
 24.05.1
 ==================
 

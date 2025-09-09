@@ -4,7 +4,7 @@
 #
 # This is free and unencumbered software released into the public domain.
 
-scriptversion='24.05.1'
+scriptversion='26.03.1'
 imagename=docker-registry.wikimedia.org/releng/node18-test-browser
 imageversion=18.20.4
 shortname=fresh-node18

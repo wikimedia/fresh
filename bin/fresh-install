@@ -62,14 +62,14 @@ def install_bin_all(secure_npm=False):
 
     # During development this can be a recent commit hash instead of a release tag,
     # to allow full testing prior to release.
-    FRESH_VERSION='24.05.1'
-    FRESH_NODE16_SHA256='93b98426e4bbbad04f16053108409cec0beb5b5fcbc33662cb359b619e2c8e5f'
-    FRESH_NODE18_SHA256='aed7e4ef20c43da34446c93dc9b5ad344736895e59c85d4ec7867b1bc9603433'
-    FRESH_NODE20_SHA256='f005ddd3081a0eabf3c8bd0edba6171793870d0cb3073c8e179e1a71779f7786'
-    FRESH_NODE22_SHA256='2028ef73f5425894dc7df8ce7b10da7cb54a169674a5c81250d1e425d18f341c'
-    FRESH_NODE24_SHA256='UPDATEME2028ef73f5425894dc7df8ce7b10da7cb54a169674a5c81250d1e425d18f341c'
+    FRESH_VERSION='8593e464979800eecdfd56b9b7f3a48e7c5d1e26'
+    FRESH_NODE16_SHA256='89333e0aa1193f6d7e905f99827a8862f9260eac59ec33d80e78755bb4ad4dbd'
+    FRESH_NODE18_SHA256='86a556cb5bcef72f8f036b33507db97c2c6948dca116ebb150c206d15c750ed6'
+    FRESH_NODE20_SHA256='59279cb99a4beb3b4a41cb511d294f8c0f6f4388372f7f6dabc242ec24bc2fda'
+    FRESH_NODE22_SHA256='2a3b38596c3228ebe7203e29712e5d09c3d306806ef267c99cf7f0b0b6329f2a'
+    FRESH_NODE24_SHA256='0eb4651ad0d65a96d973b5e689052b190fe74ed1f887eb733c54a5fce7e17bb5'
 
-    FRESH_NPM_SHA256='4d46fedd6f222e6edf4f9b8924a2ead8a6771766e6a9972872e33c58b8a47db9'
+    FRESH_NPM_SHA256='26ef50e51886cc243621ccfa79d414e63274cecf0398b6ae94d4f8f73b053207'
 
     # Run get_bin_path first to improve message order
     # e.g. not "creating dir" between two "installing" messages
@@ -79,7 +79,7 @@ def install_bin_all(secure_npm=False):
     install_bin(FRESH_VERSION, 'fresh-node20', FRESH_NODE20_SHA256, 'fresh-node20')
     install_bin(FRESH_VERSION, 'fresh-node20', FRESH_NODE20_SHA256, 'fresh-node')
     install_bin(FRESH_VERSION, 'fresh-node22', FRESH_NODE22_SHA256, 'fresh-node22')
-    install_bin(FRESH_VERSION, 'fresh-node24', FRESH_NODE22_SHA256, 'fresh-node24')
+    install_bin(FRESH_VERSION, 'fresh-node24', FRESH_NODE24_SHA256, 'fresh-node24')
 
     if secure_npm:
         install_bin(FRESH_VERSION, 'fresh-npm', FRESH_NPM_SHA256, 'npm')
