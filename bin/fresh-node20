@@ -6,7 +6,7 @@
 
 scriptversion='24.05.1'
 imagename=docker-registry.wikimedia.org/releng/node20-test-browser
-imageversion=20.19.1
+imageversion=20.19.5
 shortname=fresh-node20
 mountsrc="$PWD"
 mountdest="/"$(basename "$PWD")
@@ -200,7 +200,7 @@ echo -e '\033]2;'"$shortname"'\007\c'
 # 1. Run `FRESH_INTERNAL_RUNCMD=_fresh_versions ./bin/fresh-node`
 # 2. Update the welcome_versions string below.
 #
-welcome_versions="░ Node.js 20 ░ npm 10 ░ Firefox 115 ░ Chromium 120 ░ Debian 11 Bullseye"
+welcome_versions="░ Node.js 20 ░ npm 10 ░ Firefox 128 ░ Chromium 140 ░ Debian 12 Bookworm"
 
 welcome_text="$CLR_GREY# 🌱 ${CLR_BOLD}${CLR_GREEN}Fresh $scriptversion$CLR_NONE$CLR_GREY $welcome_versions
 # image: $imagename:$imageversion
