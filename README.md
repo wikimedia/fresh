@@ -96,6 +96,8 @@ reachable.
 
 Any changes made elsewhere in the container, are lost once you exit Fresh.
 
+The `.git` directory of your project is mounted as **read-only** inside the Fresh container. This prevents malicious code (e.g., from `npm install` or `npm test`) adding Git hooks (like `pre-commit` or `post-merge`) that could later execute arbitrary commands on your host system outside the container ([T259977](https://phabricator.wikimedia.org/T259977)).
+
 ### Why?
 
 When you open an application or execute a program from the terminal,

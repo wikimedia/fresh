@@ -122,6 +122,7 @@ if [ -n "$use_podman" ]; then
 	welcometxt_suffix+="\n# ${CLR_PINK}runtime: podman ($podman_reason)${CLR_NONE}"
 fi
 if [ -e "$mountsrc/.git" ]; then
+	# SECURITY: After mounting the current directory, re-mount any ".git" in read-only mode (T259977)
 	welcometxt_suffix+="\n#        $mountdest/.git ➟ $mountsrc/.git (read-only)"
 	docker_args+=("--mount" "type=bind,source=$mountsrc/.git,target=$mountdest/.git,readonly$bind_fastread")
 fi
