@@ -159,6 +159,31 @@ title "basic invocation"
 	./bin/fresh-node18 -- exit > /dev/null
 }
 
+title "help / show option docs"
+{
+	code=0
+	result=$(./bin/fresh-node18 --help) || code="$?"
+	assert_equals "$code" "0"
+	assert_contains "$result" "usage: fresh-node18"
+	assert_contains "$result" "Options:"
+	assert_contains "$result" "-env-mw"
+	assert_contains "$result" "If an \`.env\` file exists"
+	assert_contains "$result" "--env=PREFIX"
+	assert_contains "$result" "Docker Desktop"
+	assert_contains "$result" "MediaWiki webserver"
+	assert_contains "$result" "-podman"
+	assert_contains "$result" "pass it after --"
+}
+
+title "help / unknown option shows help"
+{
+	code=0
+	result=$(./bin/fresh-node18 --wat 2>&1) || code="$?"
+	assert_equals "$code" "1"
+	assert_contains "$result" "unknown option: --wat"
+	assert_contains "$result" "Options:"
+}
+
 title "runcmd"
 {
 	result=$(./bin/fresh-node18 -- echo 42)

@@ -28,6 +28,43 @@ in_positional_args=
 POSITIONAL_ARGS=()
 DOCKER_BIN=docker
 
+usage() {
+	cat <<EOF
+usage: $shortname [-env-mw] [-env-bs] [-env-sauce] [-env=PREFIX] [-net] [-root] [-podman] [--] [<command>]
+
+Start a Fresh container for the current project directory.
+
+Options:
+  -e, -env, -env-mw  Forward MW_* and MEDIAWIKI_* environment variables,
+                     such as those defined in \`~/.bashrc\`.
+                     If an \`.env\` file exists in the current directory,
+                     matching entries are read and take precedence.
+
+  -env-bs            Forward BROWSERSTACK_* variables for BrowserStack testing.
+
+  -env-sauce         Forward SAUCE_* variables for SauceLabs testing.
+
+  -env=PREFIX, --env=PREFIX
+                     Forward variables that start with PREFIX.
+                     To forward all variables, use \`-env=\`.
+
+  -net               Expose your local network to the container.
+                     For example, to access a MediaWiki webserver on your host.
+                     On Docker Desktop, you also need to enable host networking there.
+                     <https://docs.docker.com/engine/network/drivers/host/>
+
+  -root              Login as root in the container, for example to run \`sudo apt-get\`.
+
+  -podman            Force use of Podman.
+                     The default detects Docker or Podman, and selects Docker if you have both.
+
+  -h, --help         Show this help text.
+
+To run a single command without launching a shell, pass it after --.
+For example, \`$shortname -- npm test\`
+EOF
+}
+
 function enable_podman {
 	use_podman=1
 	podman_reason=$1
@@ -39,44 +76,18 @@ for arg in "$@"; do
 		continue
 	fi
 	case "$arg" in
-		# Option: -env-mw
-		#   Forward `MW_*` and `MEDIAWIKI_*` environment variables from the host machine
-		#   to the Fresh container. This is designed for use with MediaWiki tests.
-		#   If an `.env` file exists in the current directory, its `MW_*` and `MEDIAWIKI_` entries
-		#   will also be read and forwarded to the container.
-		#   Note that the variables set in via `.env` take precedence over variables set at
-		#   runtime e.g. from `export` commands in `.bashrc`.
 		-e|-env|-env-mw) allow_env_mw=1 ;;
-		# Option: -env-bs
-		#   Forward `BROWSERSTACK_*` environment variables from the host to the Fresh container.
-		#   This is designed for running tests involving BrowserStack.
 		-env-bs) env_prefixes+=("BROWSERSTACK_") ;;
-		# Option: -env-sauce
-		#   Forward `SAUCE_*` environment variables from the host to the Fresh container.
-		#   This is designed for debugging browser tests involving webdriver and SauceLabs.
 		-env-sauce) env_prefixes+=("SAUCE_") ;;
-		# Option: -env=PREFIX
-		#   Forward any environment variables with a given prefix from the host to the Fresh container.
-		#   To forward all environment variables, use `-env=`.
 		-env=*|--env=*) env_prefixes+=("${arg#*=}") ;;
-		# Option: -net
-		#   This exposes network ports from the host machine to the Fresh container.
-		#   For example, to enable access to a MediaWiki web server.
-		#   https://docs.docker.com/network/network-tutorial-host/
 		-net) allow_net=1 ;;
-		# Option: -root
-		#   Log into to the Fresh container user 'root' instead of 'nobody'.
-		#   This means you can use sudo commands inside the container, such as apt-get.
 		-root) allow_root=1 ;;
-		# Option: -podman
-		#   Force use of Podman instead of Docker.
-		#   By default, Fresh uses whichever runtime is available, selecting Docker if both are.
 		-podman) enable_podman "-podman option" ;;
+		-h|--help) usage ; exit 0 ;;
 		--) in_positional_args=1 ;;
 		*)
 		echo "unknown option: $arg" 1>&2
-		echo "usage: $shortname [-env-mw] [-env-bs] [-env-sauce] [env=PREFIX] [-net] [-root] [-podman] [-- command]" 1>&2
-		echo "to run a command in the container, pass it after --" 1>&2
+		usage 1>&2
 		exit 1
 		;;
 	esac

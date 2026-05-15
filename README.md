@@ -62,6 +62,8 @@ reduce chances of accidentally running commands on your host machine instead.
 To run a single command without launching a shell, use `fresh-node -- <command>`,
 e.g. `fresh-node -- npm install`.
 
+To see all available options, run `fresh-node --help`.
+
 ## How does it work
 
 The first time you start a Fresh environment, Docker will download the
