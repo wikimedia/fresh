@@ -1,3 +1,26 @@
+26.06.1
+==================
+
+### Added
+
+* Add `--help` option to all fresh-node commands. (LazyShrey) [T424867](https://phabricator.wikimedia.org/T424867)
+
+### Changed
+
+* fresh-install: Promote fresh-node24 to be the default. (Timo Tijhof)
+* fresh-node20: Update image to docker-registry.wikimedia.org/releng/node20-test-browser:20.20.2-s1.
+  * Update Node.js from 20.19.5 to 20.20.2.
+  * Update Firefox from 128 to 140.
+  * Update Chromium from 140 to 147.
+* fresh-node22: Update image to docker-registry.wikimedia.org/releng/node22-test-browser:22.22.2-s1.
+  * Update Node.js from 22.19.0 to 22.22.2.
+  * Update Firefox from 128 to 140.
+  * Update Chromium from 140 to 147.
+* fresh-node24: Update image to docker-registry.wikimedia.org/releng/node24-test-browser:24.14.1-s1.
+  * Update Node.js from 24.7.0 to 24.14.1.
+  * Update Firefox from 128 to 140.
+  * Update Chromium from 140 to 147.
+
 26.03.1
 ==================
 

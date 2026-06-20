@@ -62,14 +62,14 @@ def install_bin_all(secure_npm=False):
 
     # During development this can be a recent commit hash instead of a release tag,
     # to allow full testing prior to release.
-    FRESH_VERSION='26.03.1'
-    FRESH_NODE16_SHA256='89333e0aa1193f6d7e905f99827a8862f9260eac59ec33d80e78755bb4ad4dbd'
-    FRESH_NODE18_SHA256='86a556cb5bcef72f8f036b33507db97c2c6948dca116ebb150c206d15c750ed6'
-    FRESH_NODE20_SHA256='59279cb99a4beb3b4a41cb511d294f8c0f6f4388372f7f6dabc242ec24bc2fda'
-    FRESH_NODE22_SHA256='2a3b38596c3228ebe7203e29712e5d09c3d306806ef267c99cf7f0b0b6329f2a'
-    FRESH_NODE24_SHA256='0eb4651ad0d65a96d973b5e689052b190fe74ed1f887eb733c54a5fce7e17bb5'
+    FRESH_VERSION='594f61e2688bb3aa35ddaa6ec84806a1a94a7bf6'
+    FRESH_NODE16_SHA256='e0e265d6d2105c99aaa4a27f02b45465c815b6c510c3d3ffcfdadbd18ae9e3b9'
+    FRESH_NODE18_SHA256='8a8c093b9af8abf5c615280d55c7acf1e8f58847f2984f49f23a901601dd9672'
+    FRESH_NODE20_SHA256='5ea80fbace9699168c405a45d0bf1d234ea0eaca84f99b55ec9d3f6e64e92180'
+    FRESH_NODE22_SHA256='25a6964379862559d9cd3f1db1bc8afc905e70c5c5a10762b2f4d94b2b4ef304'
+    FRESH_NODE24_SHA256='9477406c8a0d0244c263f52e5d7df35f4707c56657aeb87dd80893e7505d7e06'
 
-    FRESH_NPM_SHA256='26ef50e51886cc243621ccfa79d414e63274cecf0398b6ae94d4f8f73b053207'
+    FRESH_NPM_SHA256='71bb97310890bdbe7f54ad4d30d1fa233a26f89db1374a66eccc149b9c4d7efc'
 
     # Run get_bin_path first to improve message order
     # e.g. not "creating dir" between two "installing" messages
