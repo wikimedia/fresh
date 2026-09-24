@@ -126,10 +126,6 @@ if [ -z "$use_podman" ]; then
 fi
 if [ -n "$use_podman" ]; then
 	DOCKER_BIN=podman
-	# The 'consistency' bind options are not supported by Podman.
-	# - https://phabricator.wikimedia.org/T259974#6713393
-	bind_fastwrite=
-	bind_fastread=
 	welcometxt_suffix+="\n# ${CLR_PINK}runtime: podman ($podman_reason)${CLR_NONE}"
 fi
 if [ -e "$mountsrc/.git" ]; then
