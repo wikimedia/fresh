@@ -23,7 +23,7 @@ Review [fresh-install](/bin/fresh-install) source.
 * **Firefox**
 * **Chromium**
 * `chromedriver`, `ffmpeg`, and `xvfb` (for browser tests)
-* JSDuck
+* JSDuck (no more provided starting since Node 24 images)
 * Debian Linux
 
 ### Prerequisites
