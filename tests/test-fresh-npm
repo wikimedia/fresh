@@ -1,4 +1,6 @@
 #!/usr/bin/env -S -i /bin/bash
+# shellcheck shell=bash
+# vim: filetype=bash
 
 set -e
 set -u
@@ -9,10 +11,10 @@ set -u
 
 BASE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-cd $BASE
+cd "$BASE"
 
 trim() {
-	read input
+	read -r input
 	echo -n "${input%%[[:space:]]}"
 }
 
@@ -37,9 +39,9 @@ assert_equals() {
 	actual="$1"
 	expected="$2"
 	if [[ "$actual" == "$expected" ]]; then
-		printf "      equals \"$expected\"\n"
+		printf '      equals "%s"\n' "$expected"
 	else
-		printf "      \"${actual}\" == \"${expected}\"\n"
+		printf '      "%s" == "%s"\n' "$actual" "$expected"
 		false
 	fi
 }
@@ -49,9 +51,9 @@ assert_lastline() {
 }
 
 assert_contains() {
-	printf "      contains \"$2\"\n"
+	printf '      contains "%s"\n' "$2"
 	if [[ "$1" != *"$2"* ]]; then
-		printf "\n$1"
+		printf '\n%s' "$1"
 		false
 	fi
 }

@@ -1,4 +1,6 @@
 #!/usr/bin/env -S -i /bin/bash
+# shellcheck shell=bash
+# vim: filetype=bash
 
 set -e
 set -u
@@ -17,6 +19,8 @@ export PATH="$PATH:/usr/local/bin/"
 ENV_IGNORE=("_" "SHLVL" "PWD" "OLDPWD" "PATH")
 clean_env() {
 	for name in $(compgen -e); do
+		# Quick hack to find whether an item is in an array
+		# shellcheck disable=SC2076
 		if [[ ! " ${ENV_IGNORE[*]} " =~ " ${name} " ]]; then
 			# echo "... unset $name"
 			unset -v "$name"
@@ -24,12 +28,12 @@ clean_env() {
 	done
 }
 
-cd $BASE
+cd "$BASE"
 
 ./tests/test-fresh-npm
 
 trim() {
-	read input
+	read -r input
 	echo -n "${input%%[[:space:]]}"
 }
 
@@ -63,9 +67,9 @@ assert_equals() {
 	actual="$1"
 	expected="$2"
 	if [[ "$actual" == "$expected" ]]; then
-		printf "      equals \"$expected\"\n"
+		printf '      equals "%s"\n' "$expected"
 	else
-		printf "      \"${actual}\" == \"${expected}\"\n"
+		printf '      "%s" == "%s"\n' "$actual" "$expected"
 		false
 	fi
 }
@@ -75,23 +79,23 @@ assert_lastline() {
 }
 
 assert_contains() {
-	printf "      contains \"$2\"\n"
+	printf '      contains "%s"\n' "$2"
 	if [[ "$1" != *"$2"* ]]; then
-		printf "\n$1"
+		printf '\n%s' "$1"
 		false
 	fi
 }
 
 assert_matches() {
-	printf "      contains \"$2\" (regex)\n"
+	printf '      contains "%s" (regex)\n' "$2"
 	if [[ ! "$1" =~ $2 ]]; then
-		printf "\n$1"
+		printf '\n%s' "$1"
 		false
 	fi
 }
 
 assert_msg() {
-	printf "      $1\n"
+	printf '      %s\n' "$1"
 }
 
 clean_fs() {
@@ -106,7 +110,7 @@ title "install / install to ~/.local/bin"
 	myhome="$PWD/myhome"
 	mypath="/bin:/usr/bin:$myhome/.local/bin"
 
-	result=$(FRESH_INTERNAL_TEST=1 PATH="$mypath" HOME="$myhome" $BASE/bin/fresh-install)
+	result=$(FRESH_INTERNAL_TEST=1 PATH="$mypath" HOME="$myhome" "$BASE"/bin/fresh-install)
 	assert_matches "$result" "creating .*/myhome/.local/bin"
 	assert_contains "$result" "installing fresh-node"
 	assert_matches "$result" "Fresh .+ is now ready!"
@@ -124,7 +128,7 @@ title "install / install to ~/bin"
 	myhome="$PWD/myhome"
 	mypath="/bin:/usr/bin:$myhome/bin"
 
-	result=$(FRESH_INTERNAL_TEST=1 PATH="$mypath" HOME="$myhome" $BASE/bin/fresh-install)
+	result=$(FRESH_INTERNAL_TEST=1 PATH="$mypath" HOME="$myhome" "$BASE"/bin/fresh-install)
 	assert_matches "$result" "creating .*/myhome/bin"
 	assert_contains "$result" "installing fresh-node"
 	assert_matches "$result" "Fresh .+ is now ready!"
@@ -143,7 +147,7 @@ title "install / cannot find a place"
 	mypath="/bin:/usr/bin"
 	code=0
 
-	result=$(FRESH_INTERNAL_TEST=1 PATH="$mypath" HOME="$myhome" $BASE/bin/fresh-install 2>&1) || code="$?"
+	result=$(FRESH_INTERNAL_TEST=1 PATH="$mypath" HOME="$myhome" "$BASE"/bin/fresh-install 2>&1) || code="$?"
 	assert_contains "$result" "Tried the following places: /usr/local/bin, ~/"
 	assert_contains "$result" "fresh-install: Could not find writable installation folder"
 	assert_equals "$code" "1"
@@ -217,7 +221,7 @@ title "packages / advertised software versions"
 
 title "environment / default CHROMIUM_FLAGS"
 {
-	result=$(./bin/$FRESH_BIN -- 'echo $CHROMIUM_FLAGS')
+	result=$(./bin/$FRESH_BIN -- "echo \$CHROMIUM_FLAGS")
 	assert_lastline "$result" "--no-sandbox"
 }
 
@@ -226,7 +230,7 @@ title "environment / warn if no MW_ vars with -env-mw"
 	mkdir -p fixtures/myproject
 	pushd fixtures/myproject
 
-	result=$($BASE/bin/$FRESH_BIN -env-mw -- exit)
+	result=$("$BASE"/bin/$FRESH_BIN -env-mw -- exit)
 	assert_contains "$result" "env: MW_*, MEDIAWIKI_* (none found)"
 
 	popd
@@ -235,28 +239,28 @@ title "environment / warn if no MW_ vars with -env-mw"
 title "environment / protect FOO by default"
 {
 	export FOO="inherited"
-	result=$(./bin/$FRESH_BIN -- 'echo $FOO')
+	result=$(./bin/$FRESH_BIN -- "echo \$FOO")
 	assert_lastline "$result" ""
 }
 
 title "environment / protect MW_FOO by default"
 {
 	export MW_FOO="inherited"
-	result=$(./bin/$FRESH_BIN -- 'echo $MW_FOO')
+	result=$(./bin/$FRESH_BIN -- "echo \$MW_FOO")
 	assert_lastline "$result" ""
 }
 
 title "environment / inherit MW_FOO with -env"
 {
 	export MW_FOO="inherited"
-	result=$(./bin/$FRESH_BIN -env -- 'echo $MW_FOO')
+	result=$(./bin/$FRESH_BIN -env -- "echo \$MW_FOO")
 	assert_lastline "$result" "inherited"
 }
 
 title "environment / inherit MEDIAWIKI_FOO with -env"
 {
 	export MEDIAWIKI_FOO="inherited"
-	result=$(./bin/$FRESH_BIN -env -- 'echo $MEDIAWIKI_FOO')
+	result=$(./bin/$FRESH_BIN -env -- "echo \$MEDIAWIKI_FOO")
 	assert_lastline "$result" "inherited"
 }
 
@@ -266,7 +270,7 @@ title "environment / inherit MEDIAWIKI_BAR .env file with -env"
 	pushd fixtures/myproject
 	echo "MEDIAWIKI_BAR=inherited" > .env
 
-	result=$($BASE/bin/$FRESH_BIN -env -- 'echo $MEDIAWIKI_BAR')
+	result=$("$BASE"/bin/$FRESH_BIN -env -- "echo \$MEDIAWIKI_BAR")
 	assert_lastline "$result" "inherited"
 
 	popd
@@ -279,7 +283,7 @@ title "environment / inherit MEDIAWIKI_BAZ .env file with -env, overriding expor
 
 	export MEDIAWIKI_BAZ="inherited"
 	echo "MEDIAWIKI_BAZ=overridden" > .env
-	result=$($BASE/bin/$FRESH_BIN -env -- 'echo $MEDIAWIKI_BAZ')
+	result=$("$BASE"/bin/$FRESH_BIN -env -- "echo \$MEDIAWIKI_BAZ")
 	assert_lastline "$result" "overridden"
 
 	popd
@@ -288,35 +292,35 @@ title "environment / inherit MEDIAWIKI_BAZ .env file with -env, overriding expor
 title "environment / warn if no BROWSERSTACK_ vars with -env-bs"
 {
 	export FOO="inherited"
-	result=$($BASE/bin/$FRESH_BIN -env-bs -- exit)
+	result=$("$BASE"/bin/$FRESH_BIN -env-bs -- exit)
 	assert_contains "$result" "env: BROWSERSTACK_* (none found)"
 }
 
 title "environment / inherit BROWSERSTACK vars with -env-bs"
 {
 	export BROWSERSTACK_KEY="quay"
-	result=$($BASE/bin/$FRESH_BIN -env-bs -- 'echo $BROWSERSTACK_KEY')
+	result=$("$BASE"/bin/$FRESH_BIN -env-bs -- "echo \$BROWSERSTACK_KEY")
 	assert_lastline "$result" "quay"
 }
 
 title "environment / warn if no SAUCE_ vars with -env-sauce"
 {
 	export FOO="inherited"
-	result=$($BASE/bin/$FRESH_BIN -env-sauce -- exit)
+	result=$("$BASE"/bin/$FRESH_BIN -env-sauce -- exit)
 	assert_contains "$result" "env: SAUCE_* (none found)"
 }
 
 title "environment / inherit SAUCE vars with -env-sauce"
 {
 	export SAUCE_ACCESS_KEY="caye"
-	result=$($BASE/bin/$FRESH_BIN -env-sauce -- 'echo $SAUCE_ACCESS_KEY')
+	result=$("$BASE"/bin/$FRESH_BIN -env-sauce -- "echo \$SAUCE_ACCESS_KEY")
 	assert_lastline "$result" "caye"
 }
 
 title "environment / protect FOO even with -env-mw"
 {
 	export FOO="inherited"
-	result=$(./bin/$FRESH_BIN -env-mw -- 'echo $FOO')
+	result=$(./bin/$FRESH_BIN -env-mw -- "echo \$FOO")
 	assert_lastline "$result" ""
 }
 
@@ -326,25 +330,25 @@ title "environment / inherit FOO with -env=FOO"
 	export FOOLING="two"
 	export BAR="nope"
 	export BAR_FOO="nah"
-	result=$(./bin/$FRESH_BIN -env=FOO -- 'echo $FOO $BAR $BAR_FOO $FOOLING')
+	result=$(./bin/$FRESH_BIN -env=FOO -- "echo \$FOO \$BAR \$BAR_FOO \$FOOLING")
 	assert_lastline "$result" "one two"
 }
 
 title "user / default (Linux)"
-λ() {
+λ_linux() {
 	host_uid=$(id -u)
 	result=$(./bin/$FRESH_BIN -- /usr/bin/id -u)
 	assert_lastline "$result" "$host_uid"
 }
-if_linux λ
+if_linux λ_linux
 # user ID will not be passed on macOS.
 
 title "user / default (macOS)"
-λ() {
+λ_mac() {
 	result=$(./bin/$FRESH_BIN -- /usr/bin/id -un)
 	assert_lastline "$result" "nobody"
 }
-if_mac λ
+if_mac λ_mac
 
 title "user / with -root"
 {
@@ -358,7 +362,7 @@ title "mount / expose current directory as readable"
 	pushd fixtures/myread
 	echo "exposed content" > file.txt
 
-	result=$($BASE/bin/$FRESH_BIN -- cat /myread/file.txt) || true
+	result=$("$BASE"/bin/$FRESH_BIN -- cat /myread/file.txt) || true
 	assert_lastline "$result" "exposed content"
 
 	popd
@@ -370,7 +374,7 @@ title "mount / expose current directory as writable"
 	pushd fixtures/mywrite
 	echo "original content" > file.txt
 
-	$BASE/bin/$FRESH_BIN -- 'echo changed content > /mywrite/file.txt' > /dev/null || true
+	"$BASE"/bin/$FRESH_BIN -- 'echo changed content > /mywrite/file.txt' > /dev/null || true
 	result=$(cat file.txt)
 	assert_lastline "$result" "changed content"
 
@@ -384,7 +388,7 @@ title "mount / cannot write to .git subdirectory file"
 	echo "original content" > .git/file.txt
 	code=0
 
-	$BASE/bin/$FRESH_BIN -- 'echo changed content > /myproject/.git/file.txt' > /dev/null || code="$?"
+	"$BASE"/bin/$FRESH_BIN -- 'echo changed content > /myproject/.git/file.txt' > /dev/null || code="$?"
 	result=$(cat .git/file.txt)
 	assert_lastline "$result" "original content"
 	assert_equals "$code" "2"
@@ -398,7 +402,7 @@ title "mount / cannot create a .git subdirectory file"
 	pushd fixtures/myproject
 	code=0
 
-	$BASE/bin/$FRESH_BIN -- touch /myproject/.git/file.txt > /dev/null || code="$?"
+	"$BASE"/bin/$FRESH_BIN -- touch /myproject/.git/file.txt > /dev/null || code="$?"
 	result=$(test -f .git/file.txt && echo created file || echo not created)
 	assert_equals "$result" "not created"
 	assert_equals "$code" "1"
