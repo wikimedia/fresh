@@ -1,13 +1,14 @@
 #!/bin/bash -eu
 
+# shellcheck source=/dev/null
 . /etc/os-release
 
 R_NUM='s/[^0-9]*\([0-9]*\).*/\1/'
 
-printf "\n\
-░ Node.js $(node --version | sed $R_NUM) \
-░ npm $(npm --version | sed $R_NUM) \
-░ Firefox $(firefox --version | sed $R_NUM) \
-░ Chromium $(chromium --product-version 2>/dev/null | sed $R_NUM) \
-░ Debian $VERSION_ID ${VERSION_CODENAME^}\
-\n";
+printf '\n'
+printf '░ Node.js %s' "$(node --version | sed "$R_NUM")"
+printf ' ░ npm %s' "$(npm --version | sed "$R_NUM")"
+printf ' ░ Firefox %s' "$(firefox --version | sed "$R_NUM")"
+printf ' ░ Chromium %s' "$(chromium --product-version 2>/dev/null | sed "$R_NUM")"
+printf ' ░ Debian %s %s' "$VERSION_ID" "${VERSION_CODENAME^}"
+printf '\n'
