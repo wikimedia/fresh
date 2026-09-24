@@ -66,6 +66,7 @@ def install_bin_all(secure_npm=False):
     FRESH_NODE20_SHA256='5ea80fbace9699168c405a45d0bf1d234ea0eaca84f99b55ec9d3f6e64e92180'
     FRESH_NODE22_SHA256='25a6964379862559d9cd3f1db1bc8afc905e70c5c5a10762b2f4d94b2b4ef304'
     FRESH_NODE24_SHA256='9477406c8a0d0244c263f52e5d7df35f4707c56657aeb87dd80893e7505d7e06'
+    FRESH_NODE26_SHA256='c6eca0ab443637fa92d12639c66e40d681c21cef408543b419ffcab835ca9bf6'
 
     FRESH_NPM_SHA256='71bb97310890bdbe7f54ad4d30d1fa233a26f89db1374a66eccc149b9c4d7efc'
 
@@ -75,6 +76,7 @@ def install_bin_all(secure_npm=False):
     install_bin(FRESH_VERSION, 'fresh-node20', FRESH_NODE20_SHA256, 'fresh-node20')
     install_bin(FRESH_VERSION, 'fresh-node22', FRESH_NODE22_SHA256, 'fresh-node22')
     install_bin(FRESH_VERSION, 'fresh-node24', FRESH_NODE24_SHA256, 'fresh-node24')
+    install_bin(FRESH_VERSION, 'fresh-node26', FRESH_NODE26_SHA256, 'fresh-node26')
     install_bin(FRESH_VERSION, 'fresh-node24', FRESH_NODE24_SHA256, 'fresh-node')
 
     if secure_npm:
@@ -100,6 +102,7 @@ def debug_checksums():
     make_checksum('fresh-node20')
     make_checksum('fresh-node22')
     make_checksum('fresh-node24')
+    make_checksum('fresh-node26')
     make_checksum('fresh-npm')
 
 
