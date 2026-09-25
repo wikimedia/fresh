@@ -72,7 +72,7 @@ function enable_podman {
 
 for arg in "$@"; do
 	if [ -n "$in_positional_args" ]; then
-		POSITIONAL_ARGS+=($arg)
+		POSITIONAL_ARGS+=( "$arg" )
 		continue
 	fi
 	case "$arg" in
@@ -224,7 +224,7 @@ if [ -n "${FRESH_INTERNAL_RUNCMD:-}" ]; then
 		runcmd=/_fresh/_fresh_versions
 	fi
 elif [ ${#POSITIONAL_ARGS[@]} -gt 0 ]; then
-	runcmd="echo \"$welcome_text\n\";${POSITIONAL_ARGS[@]}"
+	runcmd="echo \"$welcome_text\n\";${POSITIONAL_ARGS[*]}"
 else
 	docker_args+=("--interactive" "--tty")
 	runcmd="echo \"$welcome_text\n\";bash"
