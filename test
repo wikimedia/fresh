@@ -6,7 +6,7 @@ set -u
 BASE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ISMAC=$(test "$(uname -s)" = "Darwin" && echo "1" || echo "")
 ISLINUX=$(test "$(uname -s)" = "Linux" && echo "1" || echo "")
-FRESH_BIN=fresh-node18
+FRESH_BIN=fresh-node20
 
 # We use `env -i` to disable inheritance of environment variables from
 # the developer's own command-line, so that test cases are in control
