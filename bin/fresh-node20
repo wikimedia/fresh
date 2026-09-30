@@ -4,7 +4,7 @@
 #
 # This is free and unencumbered software released into the public domain.
 
-scriptversion='26.06.1'
+scriptversion='26.09.1'
 imagename=docker-registry.wikimedia.org/releng/node20-test-browser
 imageversion=20.20.2-s1
 shortname=fresh-node20

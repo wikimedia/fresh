@@ -1,3 +1,41 @@
+26.09.1
+==================
+
+### Added
+
+* podman: restore back consistency mount option for Podman. This should result
+  in slightly faster reads/writes. (Antoine Musso)
+  [T349563](https://phabricator.wikimedia.org/T349563)
+* Provide fresh-node26 based on docker-registry.wikimedia.org/releng/26.8.2-s1.
+  (Antoine Musso)
+
+### Changed
+
+* README.md: add User-agent to curl bootstrap command. (Antoine Musso)
+  [T421726](https://phabricator.wikimedia.org/T421726)
+* test: use a variable for fresh-node bin. (Antoine Musso)
+* fresh-node24: Update image to docker-registry.wikimedia.org/releng/24.18.0-s5.
+  * Update Node.js from 24.14.1 to 24.18.0
+  * Update npm from 11.11.0 to 11.16.0
+  * Update Firefox from 140.9.1 to 140.15.0
+  * Update Chromium from 147 to 153
+  * Drop jsduck and its ruby dependencies (James D. Forrester)
+  * Disable npm audit & npm fund (Peter Hedenskog)
+  * npm debug logs moved to /tmp/npm-logs (Monte Hurd)
+  * Add xauth package, required by xvfb-run, used by wdio. (Antoine Musso)
+* Pass shellcheck on scripts (Antoine Musso)
+  [T439219](https://phabricator.wikimedia.org/T439219)
+* Refactor how MediaWiki variables are passed by using a shell array (Antoine
+  Musso) [T439219](https://phabricator.wikimedia.org/T439219)
+
+### Removed
+
+* fresh-node16: Remove command and uninstall during upgrade. (Antoine Musso)
+  [T331180](https://phabricator.wikimedia.org/T331180)
+* fresh-node18: Remove command and uninstall during upgrade. (Antoine Musso)
+  [T343827](https://phabricator.wikimedia.org/T343827)
+
+
 26.06.1
 ==================
 

@@ -4,9 +4,9 @@
 #
 # This is free and unencumbered software released into the public domain.
 
-scriptversion='26.06.1'
+scriptversion='26.09.1'
 imagename=docker-registry.wikimedia.org/releng/node24-test-browser
-imageversion=24.18.0-s4
+imageversion=24.18.0-s5
 shortname=fresh-node24
 mountsrc="$PWD"
 mountdest="/"$(basename "$PWD")
@@ -208,7 +208,7 @@ echo -e '\033]2;'"$shortname"'\007\c'
 # 1. Run `FRESH_INTERNAL_RUNCMD=_fresh_versions ./bin/fresh-node`
 # 2. Update the welcome_versions string below.
 #
-welcome_versions="░ Node.js 24 ░ npm 11 ░ Firefox 140 ░ Chromium 152 ░ Debian 12 Bookworm"
+welcome_versions="░ Node.js 24 ░ npm 11 ░ Firefox 140 ░ Chromium 153 ░ Debian 12 Bookworm"
 
 welcome_text="$CLR_GREY# 🌱 ${CLR_BOLD}${CLR_GREEN}Fresh $scriptversion$CLR_NONE$CLR_GREY $welcome_versions
 # image: $imagename:$imageversion
