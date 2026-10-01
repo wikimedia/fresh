@@ -1,4 +1,4 @@
-#!/usr/bin/env -S -i /bin/bash
+#!/usr/bin/env -S -i FORCE_COLOR=${FORCE_COLOR} TERM=${TERM} /bin/bash
 # shellcheck shell=bash
 # vim: filetype=bash
 
@@ -19,7 +19,7 @@ title() {
 	clean_fs
 
 	echo
-	echo "fresh-npm test: $1..."
+	echo "${CLR_BOLD}fresh-npm test: $1...${CLR_NONE}"
 }
 
 clean_fs() {

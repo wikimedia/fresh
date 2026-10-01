@@ -1,4 +1,4 @@
-#!/usr/bin/env -S -i /bin/bash
+#!/usr/bin/env -S -i FORCE_COLOR=${FORCE_COLOR} TERM=${TERM} /bin/bash
 # shellcheck shell=bash
 # vim: filetype=bash
 
@@ -25,7 +25,7 @@ title() {
 	clean_env
 
 	echo
-	echo "fresh-node test: $1..."
+	echo "${CLR_BOLD}fresh-node test: $1...${CLR_NONE}"
 }
 
 if_mac() {

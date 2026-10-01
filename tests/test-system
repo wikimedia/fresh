@@ -1,16 +1,32 @@
 #!/usr/bin/env /bin/bash
 # shellcheck shell=bash
 
+# This file is sourced, the set options are merely to hint shellcheck
 set -eu
+
+# When caller environment lacks FORCE_COLOR/TERM, coreutils env would set them
+# to  an empty string. Unset it to avoid confusing tput
+[ -z "$FORCE_COLOR" ] && unset FORCE_COLOR
+[ -z "$TERM" ] && unset TERM
+
+[ -v FORCE_COLOR ] && export TERM=xterm
+
+CLR_NONE=$(tput sgr0 2>/dev/null || true)
+# shellcheck disable=SC2034
+CLR_BOLD=$(tput bold 2>/dev/null || true)
+CLR_GREEN=$(tput setaf 2 2>/dev/null || true)
+CLR_RED=$(tput setaf 1 2>/dev/null || true)
+# shellcheck disable=SC2034
+CLR_GREY=$(tput setaf 7 2>/dev/null || true)
 
 # Assertions
 assert_equals() {
 	actual="$1"
 	expected="$2"
 	if [[ "$actual" == "$expected" ]]; then
-		printf '      equals "%s"\n' "$expected"
+		printf "$CLR_GREEN"'      equals "%s"\n'"$CLR_NONE" "$expected"
 	else
-		printf '      "%s" == "%s"\n' "$actual" "$expected"
+		printf "$CLR_RED"'      "%s" == "%s"\n'"$CLR_NONE" "$actual" "$expected"
 		false
 	fi
 }
@@ -20,16 +36,21 @@ assert_lastline() {
 }
 
 assert_contains() {
-	printf '      contains "%s"\n' "$2"
-	if [[ "$1" != *"$2"* ]]; then
-		printf '\n%s' "$1"
+	if [[ "$1" == *"$2"* ]]; then
+		printf "$CLR_GREEN"'      contains "%s"\n'"$CLR_NONE" "$2"
+	else
+		printf "$CLR_RED"'      contains "%s"\n'"$CLR_NONE" "$2"
+		printf '\nExpected:\n\n%s\n' "$2"
+		printf '\nGot:\n\n:%s\n' "$1"
 		false
 	fi
 }
 
 assert_matches() {
-	printf '      contains "%s" (regex)\n' "$2"
-	if [[ ! "$1" =~ $2 ]]; then
+	if [[ "$1" =~ $2 ]]; then
+		printf "$CLR_GREEN"'      matches regex "%s"\n'"$CLR_NONE" "$2"
+	else
+		printf "$CLR_RED"'      matches regex "%s"\n'"$CLR_NONE" "$2"
 		printf '\n%s' "$1"
 		false
 	fi
