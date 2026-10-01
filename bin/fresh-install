@@ -12,6 +12,24 @@ import stat
 import sys
 import urllib.request
 
+# During development, to allow full testing prior to release, the release tag
+# can be replaced by a recent commit hash or reference. It will be used to
+# fetch `fresh-node` from Gitiles.
+#
+# Then run `./bin/fresh-install --debug` to update the SHA256 variables that
+# follows if needed.
+#
+FRESH_VERSION = 'refs/changes/94/1347594/5'
+
+FRESH_NODE_SHA256 = (
+    '424eb8d0bb0b9a57dfebd28f2812a5c3d700c16323618bc0f3c04fccedf40717'
+)
+FRESH_NPM_SHA256 = (
+    '2bebdcef027924c50abbba273dc52175dbbf5431d944c35e45adef0bdbeb0dcd'
+)
+
+FRESH_VERSIONS = [20, 22, 24, 26]
+FRESH_OBSOLETE_VERSIONS = [10, 12, 14, 16, 18]
 
 # Inspired by https://gerrit.wikimedia.org/g/mediawiki/tools/scap/+/3.16.0/scap/ansi.py
 clr_red = "\x1b[%sm" % (31)
@@ -55,40 +73,41 @@ npm_bin_candidates = [
     '~/bin',
 ]
 
+
 def install_bin_all(secure_npm=False):
     """
     Download, verify, and install a shell command.
     """
 
-    # During development this can be a recent commit hash instead of a release tag,
-    # to allow full testing prior to release.
-    FRESH_VERSION='26.09.1'
-    FRESH_NODE20_SHA256='6f5a53ccf9c01f4a88bca7945a7ac1b2d55489042f3c7b3737b556512b63a9a9'
-    FRESH_NODE22_SHA256='55261a745c84afe684374beb61a74512c8ec455852d23a9de06c261e96657f55'
-    FRESH_NODE24_SHA256='8bf78128adc619fac2ca602bf6ef61fdc3cfb1c29e4202f7d61784dbe525d9ec'
-    FRESH_NODE26_SHA256='867cbfc52837c0236fe9359a060877e71ade053092d3f6bcd82a7ab47afe8551'
-
-    FRESH_NPM_SHA256='2bebdcef027924c50abbba273dc52175dbbf5431d944c35e45adef0bdbeb0dcd'
-
     # Run get_bin_path first to improve message order
     # e.g. not "creating dir" between two "installing" messages
     get_bin_path(bin_candidates)
-    install_bin(FRESH_VERSION, 'fresh-node20', FRESH_NODE20_SHA256, 'fresh-node20')
-    install_bin(FRESH_VERSION, 'fresh-node22', FRESH_NODE22_SHA256, 'fresh-node22')
-    install_bin(FRESH_VERSION, 'fresh-node24', FRESH_NODE24_SHA256, 'fresh-node24')
-    install_bin(FRESH_VERSION, 'fresh-node26', FRESH_NODE26_SHA256, 'fresh-node26')
-    install_bin(FRESH_VERSION, 'fresh-node24', FRESH_NODE24_SHA256, 'fresh-node')
+    fresh_node_bin = install_bin(
+        FRESH_VERSION,
+        'fresh-node',
+        FRESH_NODE_SHA256,
+        'fresh-node'
+    )
+    fresh_node_dir = os.path.dirname(fresh_node_bin)
+
+    for version in FRESH_VERSIONS:
+        absent_bin('fresh-node%s' % version, expect_link_to='fresh-node')
+        dest = os.path.join(fresh_node_dir, 'fresh-node%s' % version)
+        if not os.path.islink(dest):
+            print('Creating symlink', dest)
+            os.symlink(src='fresh-node', dst=dest)
 
     if secure_npm:
         install_bin(FRESH_VERSION, 'fresh-npm', FRESH_NPM_SHA256, 'npm')
     else:
-        absent_bin('npm', 'gerrit.wikimedia.org/g/fresh', 'fresh-npm')
+        absent_bin(
+            'npm',
+            contains='gerrit.wikimedia.org/g/fresh',
+            cmd_src='fresh-npm'
+        )
 
-    absent_bin('fresh-node10')
-    absent_bin('fresh-node12')
-    absent_bin('fresh-node14')
-    absent_bin('fresh-node16')
-    absent_bin('fresh-node18')
+    for obsolete_version in FRESH_OBSOLETE_VERSIONS:
+        absent_bin('fresh-node%s' % obsolete_version)
 
     print('')
     print('%s  Fresh %s is now ready!' % (u'\U0001F331', FRESH_VERSION))
@@ -99,10 +118,7 @@ def debug_checksums():
     Make and print new checksums.
     This is for use during release prep, to help update fresh-install.
     """
-    make_checksum('fresh-node20')
-    make_checksum('fresh-node22')
-    make_checksum('fresh-node24')
-    make_checksum('fresh-node26')
+    make_checksum('fresh-node')
     make_checksum('fresh-npm')
 
 
@@ -117,6 +133,10 @@ def error_exit(message):
 
 
 def install_bin(version_src, cmd_src, cmd_integrity, cmd_dest):
+    """Install a binary
+
+    Return path of the installed binary.
+    """
     if cmd_src == 'fresh-npm':
         dest = os.path.join(get_bin_path(npm_bin_candidates), cmd_dest)
     else:
@@ -155,6 +175,8 @@ def install_bin(version_src, cmd_src, cmd_integrity, cmd_dest):
     current = os.stat(dest)
     os.chmod(dest, current.st_mode | stat.S_IEXEC)
 
+    return dest
+
 
 def get_bin_path(candidates):
     bin_dir = False
@@ -185,12 +207,20 @@ def get_bin_path(candidates):
     return bin_dir
 
 
-def absent_bin(cmd_dest, contains=None, cmd_src=None):
+def absent_bin(
+    cmd_dest, contains=None, cmd_src=None,
+    bin_candidates=bin_candidates, expect_link_to=None
+):
     for candidate in bin_candidates:
         candidate = os.path.expanduser(candidate)
         dest = os.path.join(candidate, cmd_dest)
 
         try:
+            if expect_link_to is not None and os.path.islink(dest):
+                if os.readlink(dest) == expect_link_to:
+                    print('link correct:', dest)
+                    continue
+
             if contains is not None:
                 with open(dest) as f:
                     # verify the contents to make sure we
@@ -199,7 +229,8 @@ def absent_bin(cmd_dest, contains=None, cmd_src=None):
                     if not contains in f.read():
                         return
             os.remove(dest)
-            print('%sremoving %s from %s%s' % (clr_grey, cmd_src or cmd_dest, dest, clr_none))
+            print('%sremoved %s from %s%s' % (clr_grey, cmd_src or cmd_dest, dest, clr_none))
+
         except (FileNotFoundError, OSError) as e:
             # Ignore if already gone
             # Ignore if no permission to remove

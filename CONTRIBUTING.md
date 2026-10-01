@@ -10,18 +10,14 @@ git remote update && git checkout -B release -t origin/HEAD
 
 ### Prep commit
 
-1. Update the bin scripts:
+1. Update versions in ``bin/fresh-node`` script:
 
-   * Set `scriptversion` to the new version string, like so:
+   * Set `scriptversion` to the new version string
 
-     ```
-     read -p "Next version number like XX.YY.ZZ: " FRESH_VERSION;
-     rm -f bin/fresh-*.bak;
-     sed -i'.bak' "s/scriptversion='[0-9a-z\.-]*'/scriptversion='${FRESH_VERSION}'/" bin/fresh-* && rm -f bin/fresh-*.bak;
-     ```
+   * Foreach changed images, invoke the versioned symlink, for example:
+     `FRESH_INTERNAL_RUNCMD=_fresh_versions bin/fresh-node26`
 
-   * Run `FRESH_INTERNAL_RUNCMD=_fresh_versions bin/fresh-node`
-     for changed scripts and copy the new welcome text into the script.
+   * Copy the new welcome text in ``bin/fresh-node``.
 
    You can run `git diff` or `git add -p` at this point to easily determine the
    image changes for the release notes (e.g. updated Firefox version).
