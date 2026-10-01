@@ -1,0 +1,68 @@
+#!/usr/bin/env /bin/bash
+# shellcheck shell=bash
+
+set -eu
+
+# Assertions
+assert_equals() {
+	actual="$1"
+	expected="$2"
+	if [[ "$actual" == "$expected" ]]; then
+		printf '      equals "%s"\n' "$expected"
+	else
+		printf '      "%s" == "%s"\n' "$actual" "$expected"
+		false
+	fi
+}
+
+assert_lastline() {
+	assert_equals "$(echo "$1" | tail -n2 | trim)" "$2"
+}
+
+assert_contains() {
+	printf '      contains "%s"\n' "$2"
+	if [[ "$1" != *"$2"* ]]; then
+		printf '\n%s' "$1"
+		false
+	fi
+}
+
+assert_matches() {
+	printf '      contains "%s" (regex)\n' "$2"
+	if [[ ! "$1" =~ $2 ]]; then
+		printf '\n%s' "$1"
+		false
+	fi
+}
+
+assert_msg() {
+	printf '      %s\n' "$1"
+}
+
+# Helpers
+ENV_IGNORE=("_" "SHLVL" "PWD" "OLDPWD" "PATH")
+clean_env() {
+	for name in $(compgen -e); do
+		# Quick hack to find whether an item is in an array
+		# shellcheck disable=SC2076
+		if [[ ! " ${ENV_IGNORE[*]} " =~ " ${name} " ]]; then
+			# echo "... unset $name"
+			unset -v "$name"
+		fi
+	done
+}
+
+pushd() {
+	# quiet
+	command pushd "$1" > /dev/null
+}
+
+popd() {
+	# quiet
+	command popd > /dev/null
+}
+
+trim() {
+	read -r input
+	echo -n "${input%%[[:space:]]}"
+}

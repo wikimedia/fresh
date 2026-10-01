@@ -13,49 +13,13 @@ BASE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 cd "$BASE"
 
-trim() {
-	read -r input
-	echo -n "${input%%[[:space:]]}"
-}
-
-pushd() {
-	# quiet
-	command pushd "$1" > /dev/null
-}
-
-popd() {
-	# quiet
-	command popd > /dev/null
-}
+source tests/test-system
 
 title() {
 	clean_fs
 
 	echo
 	echo "fresh-npm test: $1..."
-}
-
-assert_equals() {
-	actual="$1"
-	expected="$2"
-	if [[ "$actual" == "$expected" ]]; then
-		printf '      equals "%s"\n' "$expected"
-	else
-		printf '      "%s" == "%s"\n' "$actual" "$expected"
-		false
-	fi
-}
-
-assert_lastline() {
-	assert_equals "$(echo "$1" | tail -n2 | trim)" "$2"
-}
-
-assert_contains() {
-	printf '      contains "%s"\n' "$2"
-	if [[ "$1" != *"$2"* ]]; then
-		printf '\n%s' "$1"
-		false
-	fi
 }
 
 clean_fs() {
