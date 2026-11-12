@@ -94,7 +94,7 @@ def install_bin_all(secure_npm=False):
         absent_bin('fresh-node%s' % version, expect_link_to='fresh-node')
         dest = os.path.join(fresh_node_dir, 'fresh-node%s' % version)
         if not os.path.islink(dest):
-            print('Creating symlink', dest)
+            print('%screating symlink %s%s' % (clr_grey, dest, clr_none))
             os.symlink(src='fresh-node', dst=dest)
 
     if secure_npm:
@@ -218,7 +218,7 @@ def absent_bin(
         try:
             if expect_link_to is not None and os.path.islink(dest):
                 if os.readlink(dest) == expect_link_to:
-                    print('link correct:', dest)
+                    print('%sunchanged symlink %s%s' % (clr_grey, dest, clr_none))
                     continue
 
             if contains is not None:
