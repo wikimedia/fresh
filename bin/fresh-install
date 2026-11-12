@@ -74,6 +74,20 @@ npm_bin_candidates = [
 ]
 
 
+def verbose(message):
+    print('%s%s%s' % (clr_grey, message, clr_none))
+
+
+def warning(message):
+    print('%s%s%s' % (clr_yellow, message, clr_none))
+
+
+def error_exit(message):
+    print('fresh-install: %s' % (message), file=sys.stderr)
+    print(u'\u274C')
+    sys.exit(1)
+
+
 def install_bin_all(secure_npm=False):
     """
     Download, verify, and install a shell command.
@@ -94,7 +108,7 @@ def install_bin_all(secure_npm=False):
         absent_bin('fresh-node%s' % version, expect_link_to='fresh-node')
         dest = os.path.join(fresh_node_dir, 'fresh-node%s' % version)
         if not os.path.islink(dest):
-            print('%screating symlink %s%s' % (clr_grey, dest, clr_none))
+            verbose('creating symlink %s' % (dest))
             os.symlink(src='fresh-node', dst=dest)
 
     if secure_npm:
@@ -122,16 +136,6 @@ def debug_checksums():
     make_checksum('fresh-npm')
 
 
-def warning(message):
-    print('%s%s%s' % (clr_yellow, message, clr_none))
-
-
-def error_exit(message):
-    print('fresh-install: %s' % (message), file=sys.stderr)
-    print(u'\u274C')
-    sys.exit(1)
-
-
 def install_bin(version_src, cmd_src, cmd_integrity, cmd_dest):
     """Install a binary
 
@@ -142,7 +146,7 @@ def install_bin(version_src, cmd_src, cmd_integrity, cmd_dest):
     else:
         dest = os.path.join(get_bin_path(bin_candidates), cmd_dest)
 
-    print('%sinstalling %s to %s%s' % (clr_grey, cmd_src, dest, clr_none))
+    verbose('installing %s to %s' % (cmd_src, dest))
 
     # Download
     url = 'https://gerrit.wikimedia.org/g/fresh/+/%s/bin/%s?format=TEXT' % (version_src, cmd_src)
@@ -187,7 +191,7 @@ def get_bin_path(candidates):
         if not os.path.isdir(candidate):
             try:
                 os.makedirs(candidate, exist_ok=True)
-                print('%screating %s%s' % (clr_grey, candidate, clr_none))
+                verbose('creating %s' % (candidate))
             except PermissionError:
                 continue
         if not os.access(candidate, os.W_OK):
@@ -218,7 +222,7 @@ def absent_bin(
         try:
             if expect_link_to is not None and os.path.islink(dest):
                 if os.readlink(dest) == expect_link_to:
-                    print('%sunchanged symlink %s%s' % (clr_grey, dest, clr_none))
+                    verbose('unchanged symlink %s' % (dest))
                     continue
 
             if contains is not None:
@@ -229,7 +233,7 @@ def absent_bin(
                     if not contains in f.read():
                         return
             os.remove(dest)
-            print('%sremoved %s from %s%s' % (clr_grey, cmd_src or cmd_dest, dest, clr_none))
+            verbose('removed %s from %s' % (cmd_src or cmd_dest, dest))
 
         except (FileNotFoundError, OSError) as e:
             # Ignore if already gone
