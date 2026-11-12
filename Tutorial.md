@@ -11,7 +11,7 @@ The base image is generated from these Docker files:
 ## Bash script
 
 The bash script that quickly launches a temporary container can be found
-at [bin/fresh-node](./bin/fresh-node20).
+at [bin/fresh-node](./bin/fresh-node).
 
 The script is documented inline, but I'll take apart the most
 import line here as well, the `docker run` command.

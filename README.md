@@ -13,7 +13,7 @@ Run the install command from the terminal:
 curl -A "Fresh/bootstrap (Bot)" -fsS 'https://gerrit.wikimedia.org/g/fresh/+/26.09.1/bin/fresh-install?format=TEXT' | base64 --decode | python3
 ```
 
-This will download [fresh-node](/bin/fresh-node16), verify its integrity, and save it to `/usr/local/bin/` or  `$HOME/.local/bin`. Programs in these directories automatically become available as commands on your terminal.
+This will download [fresh-node](/bin/fresh-node), verify its integrity, and save it to `/usr/local/bin/` or  `$HOME/.local/bin`. Programs in these directories automatically become available as commands on your terminal.
 
 Review [fresh-install](/bin/fresh-install) source.
 
