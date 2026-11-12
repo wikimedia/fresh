@@ -4,7 +4,8 @@
 #
 # This is free and unencumbered software released into the public domain.
 
-shortname=${FRESH_SHORTNAME:-$(basename "$0")}
+scriptversion='26.11.1'
+shortname=$(basename "$0")
 mountsrc="$PWD"
 mountdest="/"$(basename "$PWD")
 instance_tmp_name="fresh_$(basename "$PWD" | tr -cd 'a-zA-Z0-9_. \-' | tr ' ' '_')_$RANDOM"
@@ -25,7 +26,6 @@ in_positional_args=
 POSITIONAL_ARGS=()
 DOCKER_BIN=docker
 
-scriptversion='26.11.1'
 
 # Map script name to an image
 #
@@ -35,11 +35,7 @@ scriptversion='26.11.1'
 #
 # Prior to a release, the welcome_versions variables must be retrieved using:
 #
-# for versions in $(seq 20 2 26); do
-#   FRESH_INTERNAL_RUNCMD=_fresh_versions \
-#   FRESH_SHORTNAME=fresh-node$version \
-#     ./bin/fresh-node;
-# done;
+# for bin in bin/fresh-node[1-9]*; do FRESH_INTERNAL_RUNCMD=_fresh_versions ./"$bin"; done;
 #
 # And then updating the values below.
 #
