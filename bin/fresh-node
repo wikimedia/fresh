@@ -25,7 +25,7 @@ in_positional_args=
 POSITIONAL_ARGS=()
 DOCKER_BIN=docker
 
-scriptversion='26.09.1'
+scriptversion='26.11.1'
 
 # Map script name to an image
 #
@@ -46,14 +46,14 @@ scriptversion='26.09.1'
 case $shortname in
 	fresh-node|fresh-node24)
 		imagename=docker-registry.wikimedia.org/releng/node24-test-browser
-		imageversion=24.18.0-s5
-		welcome_versions="░ Node.js 24 ░ npm 11 ░ Firefox 140 ░ Chromium 153 ░ Debian 12 Bookworm"
+		imageversion=24.22.3
+		welcome_versions="░ Node.js 24 ░ npm 11 ░ Firefox 153 ░ Chromium 156 ░ Debian 12 Bookworm"
 	;;
 
 	fresh-node26)
 		imagename=docker-registry.wikimedia.org/releng/node26-test-browser
-		imageversion=26.8.2-s1
-		welcome_versions="░ Node.js 26 ░ npm 11 ░ Firefox 140 ░ Chromium 153 ░ Debian 12 Bookworm"
+		imageversion=26.13.1
+		welcome_versions="░ Node.js 26 ░ npm 11 ░ Firefox 153 ░ Chromium 156 ░ Debian 12 Bookworm"
 	;;
 
 	*)

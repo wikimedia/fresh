@@ -19,10 +19,10 @@ import urllib.request
 # Then run `./bin/fresh-install --debug` to update the SHA256 variables that
 # follows if needed.
 #
-FRESH_VERSION = 'refs/changes/94/1347594/5'
+FRESH_VERSION = 'refs/changes/82/1369082/2'
 
 FRESH_NODE_SHA256 = (
-    '424eb8d0bb0b9a57dfebd28f2812a5c3d700c16323618bc0f3c04fccedf40717'
+    '65ea605bd7e54ee1e2803578467190f75355858a9d5c638238c0afb885407ce1'
 )
 FRESH_NPM_SHA256 = (
     '2bebdcef027924c50abbba273dc52175dbbf5431d944c35e45adef0bdbeb0dcd'

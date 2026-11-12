@@ -1,5 +1,27 @@
+26.11.1
+=======
+
+### Changed
+
+* Consolidate fresh-node* scripts to a single file. The versions specific
+  scripts are now symbolic links all pointing to a single fresh-node script.
+  (Antoine Musso)
+* fresh-node24: Update image to docker-registry.wikimedia.org/releng/node24-test-browser:24.22.3
+  * Update Node.js from 24.18.0 to 24.22.3
+  * Update Firefox from 140 to 153
+  * Update Chromium from 153 to 156
+* fresh-node26: Update image to docker-registry.wikimedia.org/releng/node26-test-browser:26.13.1
+  * Update Node.js from 26.8.2 to 26.13.1
+  * Update Firefox from 140 to 153
+  * Update Chromium from 153 to 156
+
+### Removed
+
+* fresh-node20 and fresh-node22, the images are no more maintained. We have
+  dropped Node 20 and 22 from CI in May 2026.
+
 26.09.1
-==================
+=======
 
 ### Added
 
