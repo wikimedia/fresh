@@ -44,18 +44,6 @@ scriptversion='26.09.1'
 # And then updating the values below.
 #
 case $shortname in
-	fresh-node20)
-		imagename=docker-registry.wikimedia.org/releng/node20-test-browser
-		imageversion=20.20.2-s1
-		welcome_versions="░ Node.js 20 ░ npm 10 ░ Firefox 140 ░ Chromium 147 ░ Debian 12 Bookworm"
-	;;
-
-	fresh-node22)
-		imagename=docker-registry.wikimedia.org/releng/node22-test-browser
-		imageversion=22.22.2-s1
-		welcome_versions="░ Node.js 22 ░ npm 10 ░ Firefox 140 ░ Chromium 147 ░ Debian 12 Bookworm"
-	;;
-
 	fresh-node|fresh-node24)
 		imagename=docker-registry.wikimedia.org/releng/node24-test-browser
 		imageversion=24.18.0-s5
